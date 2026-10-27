@@ -1,5 +1,5 @@
 {
- "_note": "投稿の作り方の設定。毎週の成果レポート(ig/report/)を見て調整。screen=実際のサイト画面をスマホで見せるリール(人っぽさ重視)。",
+ "_note": "投稿の作り方の設定。毎週の成果レポート(ig/report/)を見て調整。screen=実際のサイト画面をスマホで見せるリール(人っぽさ重視)。 リールはオーナーがアプリで音楽を付けて手動投稿(manual_reels)。",
  "pattern": [
   "reel",
   "screen",
@@ -39,5 +39,6 @@
   "botox-ebisu",
   "filler-ginza",
   "botox-tokyo"
- ]
+ ],
+ "manual_reels": true
 }

@@ -26,7 +26,9 @@ def is_pending(d):
 def preview(out, name, kind):
     cap = open(os.path.join(out, "caption.txt"), encoding="utf-8").read()
     if kind in ("reel", "screen"):
-        media = '<video src="reel.mp4" poster="cover.jpg" controls playsinline style="width:min(90vw,360px);border-radius:12px"></video>'
+        media = ('<video src="reel.mp4" poster="cover.jpg" controls playsinline style="width:min(90vw,360px);border-radius:12px"></video>'
+                 '<p><a href="reel.mp4" download style="display:inline-block;background:#3B2A2C;color:#fff;padding:12px 18px;border-radius:999px;text-decoration:none">動画を保存</a> '
+                 '<button onclick="navigator.clipboard.writeText(document.querySelector(\'pre\').innerText).then(()=>this.textContent=\'コピーしました\')" style="padding:12px 18px;border-radius:999px;border:1px solid #3B2A2C;background:#fff">キャプションをコピー</button></p>')
     else:
         imgs = sorted(f for f in os.listdir(out) if f.endswith(".jpg"))
         media = '<div class="g">' + "".join(f'<img src="{i}" alt="">' for i in imgs) + "</div>"

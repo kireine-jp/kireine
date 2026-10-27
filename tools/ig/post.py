@@ -125,7 +125,14 @@ def seq(n):
     try: return json.load(open(os.path.join(base, n, "meta.json")))["seq"]
     except Exception: return 0
 
+def manual(n):
+    """リールは手動投稿(アプリで音楽を付けるため)。plan.json の manual_reels=true のとき自動投稿しない。"""
+    try: plan = json.load(open(os.path.join(repo, "tools/ig/plan.json")))
+    except Exception: plan = {}
+    return plan.get("manual_reels") and os.path.exists(os.path.join(base, n, "reel.mp4")) and not os.environ.get("IG_DIR")
+
 def pending(n):
+    if manual(n): return False
     p = load_posted(os.path.join(base, n))
     return "ig" not in p or (TH_TOKEN and "threads" not in p and "threads_skip" not in p)
 

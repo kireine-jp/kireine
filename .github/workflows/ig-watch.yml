@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
 permissions:
   issues: write
-  contents: read
+  contents: write
 jobs:
   watch:
     if: vars.COMMENT_WATCH != 'off'
@@ -23,3 +23,13 @@ jobs:
           IG_USER_ID: ${{ secrets.IG_USER_ID }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: python3 tools/ig/comments.py
+      - name: Detect manually posted reels
+        continue-on-error: true
+        env:
+          IG_TOKEN: ${{ secrets.IG_TOKEN }}
+          IG_USER_ID: ${{ secrets.IG_USER_ID }}
+        run: |
+          python3 tools/ig/detect_manual.py
+          git config user.name "kireine-bot"; git config user.email "info@kirei-ne.com"
+          git add ig/*/posted.json 2>/dev/null || true
+          git diff --cached --quiet || (git commit -qm "ig: manual reel posted" && git pull -q --rebase && git push -q)
