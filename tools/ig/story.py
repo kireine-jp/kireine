@@ -31,7 +31,7 @@ cat, origins, name, unit, group = THEMES[wd % 7]
 def where(c):
     if c.get("scope") == "national": return "都内各院"
     a = (c.get("area") or "").split("(")
-    return (a[1].rstrip(")") if len(a) > 1 else a[0]).split("・")[0]
+    return (a[1] if len(a) > 1 else a[0]).replace(")", "").replace("）", "").split("・")[0]
 
 rows = [p for p in P if p["cat"] == cat and p.get("cond") == "通常" and p.get("tax") and p["clinicId"] in C
         and (C[p["clinicId"]].get("pref") == "東京都" or C[p["clinicId"]].get("scope") == "national")

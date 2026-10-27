@@ -1,0 +1,8 @@
+{
+ "_note": "投稿の作り方の設定。毎週の成果レポート(ig/report/)を見て、伸びた形式・テーマを前に、伸びないものを外す。",
+ "pattern": ["reel", "reel", "card"],
+ "keep": 2,
+ "reel": ["botox-tokyo", "botox-ginza", "filler-tokyo", "jaw-ginza", "booster-tokyo", "botox-ikebukuro", "spot-tokyo",
+          "botox-ebisu", "filler-ginza", "jaw-ebisu", "filler-omotesando", "jaw-ikebukuro", "botox-omotesando"],
+ "card": ["botox-tokyo", "booster-tokyo", "hair-tokyo", "filler-tokyo", "spot-tokyo"]
+}

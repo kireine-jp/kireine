@@ -130,7 +130,7 @@ def pending(n):
     return "ig" not in p or (TH_TOKEN and "threads" not in p and "threads_skip" not in p)
 
 pick = os.environ.get("IG_DIR", "").strip()
-dirs = sorted((x for x in os.listdir(base) if x != "stories" and os.path.isdir(os.path.join(base, x))), key=lambda x: (seq(x), x))
+dirs = sorted((x for x in os.listdir(base) if x not in ("stories", "threads", "report") and os.path.isdir(os.path.join(base, x))), key=lambda x: (seq(x), x))
 # 未投稿: IG未投稿のもの。Threadsだけ残っているものは直近1件のみ追いかける
 dirs = [x for x in dirs if pending(x)]
 if pick: dirs = [pick] if pick in dirs else []

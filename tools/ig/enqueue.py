@@ -5,8 +5,12 @@ import datetime, html, json, os, subprocess, sys
 
 ROT = {"card": ["botox-tokyo", "booster-tokyo", "hair-tokyo", "filler-tokyo", "spot-tokyo"],
        "reel": ["botox-tokyo", "filler-tokyo", "booster-tokyo", "spot-tokyo"]}
-KEEP = 2
 repo = os.path.abspath(sys.argv[1] if len(sys.argv) > 1 else ".")
+try: PLAN = json.load(open(os.path.join(repo, "tools/ig/plan.json"), encoding="utf-8"))
+except Exception: PLAN = {}
+ROT = {"card": PLAN.get("card", ROT["card"]), "reel": PLAN.get("reel", ROT["reel"])}
+PATTERN = PLAN.get("pattern", ["reel", "card"])
+KEEP = PLAN.get("keep", 2)
 force = "--force" in sys.argv
 base = os.path.join(repo, "ig")
 os.makedirs(base, exist_ok=True)
@@ -36,22 +40,27 @@ pre{{white-space:pre-wrap;background:#F6EEEC;padding:14px;border-radius:10px;fon
 today = datetime.date.today().isoformat()
 made = 0
 while True:
-    dirs = sorted((d for d in os.listdir(base) if d != "stories" and os.path.isdir(os.path.join(base, d))), key=lambda d: (meta(d).get("seq", 0), d))
+    dirs = sorted((d for d in os.listdir(base) if d not in ("stories", "threads", "report") and os.path.isdir(os.path.join(base, d))), key=lambda d: (meta(d).get("seq", 0), d))
     pend = [d for d in dirs if is_pending(d)]
     if len(pend) >= KEEP and not (force and made == 0):
         print(f"queue full ({len(pend)} pending): {pend}"); break
-    last_kind = meta(dirs[-1]).get("kind", "card") if dirs else "card"
-    kind = "reel" if last_kind == "card" else "card"
+    kind = PATTERN[sum(1 for x in dirs if meta(x).get("kind")) % len(PATTERN)]
     last_topic = next((meta(d).get("topic") for d in reversed(dirs) if meta(d).get("kind", "card") == kind), None)
     rot = ROT[kind]
-    topic = rot[(rot.index(last_topic) + 1) % len(rot)] if last_topic in rot else rot[0]
-    name = f"{today}-{kind}-{topic}"
-    out = os.path.join(base, name)
-    if os.path.exists(out):
-        print("already generated today:", name); break
+    i0 = (rot.index(last_topic) + 1) % len(rot) if last_topic in rot else 0
     script = "reel.py" if kind == "reel" else "cards.py"
-    subprocess.run([sys.executable, os.path.join(repo, "tools/ig", script), repo, out, topic], check=True)
-    if kind == "card" and topic in ROT["reel"]:   # Threads用テキスト(リール側は reel.py が書く)
+    out = None
+    for j in range(len(rot)):                     # データ不足のテーマは飛ばして次へ
+        topic = rot[(i0 + j) % len(rot)]
+        name = f"{today}-{kind}-{topic}"
+        out = os.path.join(base, name)
+        if os.path.exists(out): out = None; continue
+        r = subprocess.run([sys.executable, os.path.join(repo, "tools/ig", script), repo, out, topic])
+        if r.returncode == 0: break
+        print("skip", topic); subprocess.run(["rm", "-rf", out]); out = None
+    if not out:
+        print("nothing generated"); break
+    if kind == "card" and topic.split("-")[0] in ("botox", "filler", "booster", "spot"):   # Threads用テキスト
         subprocess.run([sys.executable, os.path.join(repo, "tools/ig/reel.py"), repo, out, topic, "--text-only"], check=True)
     subprocess.run([sys.executable, os.path.join(repo, "tools/ig/newstory.py"), out], check=True)
     preview(out, name, kind)

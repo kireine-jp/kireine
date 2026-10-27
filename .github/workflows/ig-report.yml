@@ -1,0 +1,24 @@
+name: 週次レポート
+on:
+  schedule:
+    - cron: "7 22 * * 0"   # 毎週月曜 7:07 JST
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency: ig-post
+jobs:
+  report:
+    runs-on: ubuntu-24.04
+    env:
+      TZ: Asia/Tokyo
+    steps:
+      - uses: actions/checkout@v5
+      - name: Build report
+        env:
+          IG_TOKEN: ${{ secrets.IG_TOKEN }}
+          IG_USER_ID: ${{ secrets.IG_USER_ID }}
+        run: python3 tools/ig/report.py . >> "$GITHUB_STEP_SUMMARY"
+      - name: Save
+        run: |
+          git config user.name "kireine-bot"; git config user.email "info@kirei-ne.com"
+          git add ig/report && (git diff --cached --quiet || (git commit -qm "report: $(date +%F)" && git pull -q --rebase && git push -q))
