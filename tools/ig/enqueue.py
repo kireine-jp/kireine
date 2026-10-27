@@ -8,7 +8,7 @@ ROT = {"card": ["botox-tokyo", "booster-tokyo", "hair-tokyo", "filler-tokyo", "s
 repo = os.path.abspath(sys.argv[1] if len(sys.argv) > 1 else ".")
 try: PLAN = json.load(open(os.path.join(repo, "tools/ig/plan.json"), encoding="utf-8"))
 except Exception: PLAN = {}
-ROT = {"card": PLAN.get("card", ROT["card"]), "reel": PLAN.get("reel", ROT["reel"])}
+ROT = {"card": PLAN.get("card", ROT["card"]), "reel": PLAN.get("reel", ROT["reel"]), "screen": PLAN.get("screen", PLAN.get("reel", ROT["reel"]))}
 PATTERN = PLAN.get("pattern", ["reel", "card"])
 KEEP = PLAN.get("keep", 2)
 force = "--force" in sys.argv
@@ -25,7 +25,7 @@ def is_pending(d):
 
 def preview(out, name, kind):
     cap = open(os.path.join(out, "caption.txt"), encoding="utf-8").read()
-    if kind == "reel":
+    if kind in ("reel", "screen"):
         media = '<video src="reel.mp4" poster="cover.jpg" controls playsinline style="width:min(90vw,360px);border-radius:12px"></video>'
     else:
         imgs = sorted(f for f in os.listdir(out) if f.endswith(".jpg"))
@@ -48,7 +48,7 @@ while True:
     last_topic = next((meta(d).get("topic") for d in reversed(dirs) if meta(d).get("kind", "card") == kind), None)
     rot = ROT[kind]
     i0 = (rot.index(last_topic) + 1) % len(rot) if last_topic in rot else 0
-    script = "reel.py" if kind == "reel" else "cards.py"
+    script = {"reel": "reel.py", "screen": "screenreel.py"}.get(kind, "cards.py")
     out = None
     for j in range(len(rot)):                     # データ不足のテーマは飛ばして次へ
         topic = rot[(i0 + j) % len(rot)]
@@ -60,7 +60,7 @@ while True:
         print("skip", topic); subprocess.run(["rm", "-rf", out]); out = None
     if not out:
         print("nothing generated"); break
-    if kind == "card" and topic.split("-")[0] in ("botox", "filler", "booster", "spot"):   # Threads用テキスト
+    if kind != "reel" and topic.split("-")[0] in ("botox", "filler", "booster", "spot"):   # Threads用テキスト
         subprocess.run([sys.executable, os.path.join(repo, "tools/ig/reel.py"), repo, out, topic, "--text-only"], check=True)
     subprocess.run([sys.executable, os.path.join(repo, "tools/ig/newstory.py"), out], check=True)
     preview(out, name, kind)

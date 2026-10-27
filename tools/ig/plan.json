@@ -1,8 +1,43 @@
 {
- "_note": "投稿の作り方の設定。毎週の成果レポート(ig/report/)を見て、伸びた形式・テーマを前に、伸びないものを外す。",
- "pattern": ["reel", "reel", "card"],
+ "_note": "投稿の作り方の設定。毎週の成果レポート(ig/report/)を見て調整。screen=実際のサイト画面をスマホで見せるリール(人っぽさ重視)。",
+ "pattern": [
+  "reel",
+  "screen",
+  "reel",
+  "card"
+ ],
  "keep": 2,
- "reel": ["botox-tokyo", "botox-ginza", "filler-tokyo", "jaw-ginza", "booster-tokyo", "botox-ikebukuro", "spot-tokyo",
-          "botox-ebisu", "filler-ginza", "jaw-ebisu", "filler-omotesando", "jaw-ikebukuro", "botox-omotesando"],
- "card": ["botox-tokyo", "booster-tokyo", "hair-tokyo", "filler-tokyo", "spot-tokyo"]
+ "reel": [
+  "botox-tokyo",
+  "botox-ginza",
+  "filler-tokyo",
+  "jaw-ginza",
+  "booster-tokyo",
+  "botox-ikebukuro",
+  "spot-tokyo",
+  "botox-ebisu",
+  "filler-ginza",
+  "jaw-ebisu",
+  "filler-omotesando",
+  "jaw-ikebukuro",
+  "botox-omotesando"
+ ],
+ "card": [
+  "botox-tokyo",
+  "booster-tokyo",
+  "hair-tokyo",
+  "filler-tokyo",
+  "spot-tokyo"
+ ],
+ "screen": [
+  "botox-ginza",
+  "filler-tokyo",
+  "botox-ikebukuro",
+  "booster-tokyo",
+  "jaw-ginza",
+  "spot-tokyo",
+  "botox-ebisu",
+  "filler-ginza",
+  "botox-tokyo"
+ ]
 }
