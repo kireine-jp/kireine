@@ -3,11 +3,14 @@ on:
   schedule:
     - cron: "23 2 1,15 * *"   # 毎月1日・15日
   workflow_dispatch:
+permissions:
+  contents: write
 jobs:
   refresh:
     runs-on: ubuntu-latest
     steps:
       - name: Refresh Instagram token (60日延長)
+        continue-on-error: true
         env:
           IG_TOKEN: ${{ secrets.IG_TOKEN }}
           GH_TOKEN: ${{ secrets.GH_PAT }}
@@ -22,18 +25,27 @@ jobs:
             gh secret set IG_TOKEN --repo "$GITHUB_REPOSITORY" --body "$new"
             echo "IG_TOKEN updated"
           fi
-      - name: Refresh Threads token
+      - uses: actions/checkout@v5
+      - name: Load Threads token
         env:
           TH_TOKEN: ${{ secrets.TH_TOKEN }}
+          TH_APP_SECRET: ${{ secrets.TH_APP_SECRET }}
+        run: bash tools/ig/th_env.sh
+      - name: Refresh Threads token
+        env:
+          TH_APP_SECRET: ${{ secrets.TH_APP_SECRET }}
           GH_TOKEN: ${{ secrets.GH_PAT }}
         run: |
           set -e
-          [ -n "$TH_TOKEN" ] || { echo "TH_TOKEN 未設定: スキップ"; exit 0; }
-          r=$(curl -sf "https://graph.threads.net/refresh_access_token?grant_type=th_refresh_token&access_token=$TH_TOKEN")
-          new=$(echo "$r" | jq -r .access_token); echo "::add-mask::$new"
+          [ -n "$TH_TOKEN" ] || { echo "Threads トークン未設定: スキップ"; exit 0; }
+          r=$(curl -s -G https://graph.threads.net/refresh_access_token -d grant_type=th_refresh_token --data-urlencode access_token="$TH_TOKEN")
+          new=$(echo "$r" | jq -r '.access_token // empty'); echo "::add-mask::$new"
+          [ -n "$new" ] || { echo "::error::Threads refresh failed: $(echo "$r" | jq -c '.error // .' | cut -c1-200)"; exit 1; }
           echo "expires_in: $(echo "$r" | jq -r .expires_in)"
-          test -n "$new" -a "$new" != null
-          if [ "$new" != "$TH_TOKEN" ]; then
-            test -n "$GH_TOKEN" || { echo "::error::新しいトークンを保存するには GH_PAT が必要です"; exit 1; }
+          if [ -f ig/threads/token.enc ] && [ -n "$TH_APP_SECRET" ]; then
+            printf %s "$new" | openssl enc -aes-256-cbc -pbkdf2 -iter 200000 -salt -a -A -pass env:TH_APP_SECRET -out ig/threads/token.enc
+            git config user.name "kireine-bot"; git config user.email "info@kirei-ne.com"
+            git add ig/threads/token.enc && (git diff --cached --quiet || (git commit -qm "threads: token refreshed" && git pull -q --rebase && git push -q))
+          elif [ "$new" != "$TH_TOKEN" ] && [ -n "$GH_TOKEN" ]; then
             gh secret set TH_TOKEN --repo "$GITHUB_REPOSITORY" --body "$new"
           fi

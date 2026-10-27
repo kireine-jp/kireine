@@ -15,6 +15,11 @@ jobs:
       TZ: Asia/Tokyo
     steps:
       - uses: actions/checkout@v5
+      - name: Load Threads token
+        env:
+          TH_TOKEN: ${{ secrets.TH_TOKEN }}
+          TH_APP_SECRET: ${{ secrets.TH_APP_SECRET }}
+        run: bash tools/ig/th_env.sh
       - uses: actions/setup-python@v6
         with: { python-version: "3.12" }
       - name: Install fonts and Chromium
@@ -38,7 +43,6 @@ jobs:
         env:
           IG_TOKEN: ${{ secrets.IG_TOKEN }}
           IG_USER_ID: ${{ secrets.IG_USER_ID }}
-          TH_TOKEN: ${{ secrets.TH_TOKEN }}
           TH_USER_ID: ${{ secrets.TH_USER_ID }}
         run: python3 tools/ig/story_post.py . "${{ steps.r.outputs.day }}"
       - name: Save record

@@ -17,13 +17,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
+      - name: Load Threads token
+        env:
+          TH_TOKEN: ${{ secrets.TH_TOKEN }}
+          TH_APP_SECRET: ${{ secrets.TH_APP_SECRET }}
+        run: bash tools/ig/th_env.sh
       - uses: actions/setup-python@v6
         with: { python-version: "3.12" }
       - name: Post carousel
         env:
           IG_TOKEN: ${{ secrets.IG_TOKEN }}
           IG_USER_ID: ${{ secrets.IG_USER_ID }}
-          TH_TOKEN: ${{ secrets.TH_TOKEN }}
           TH_USER_ID: ${{ secrets.TH_USER_ID }}
           IG_DIR: ${{ github.event.inputs.dir }}
         run: python3 tools/ig/post.py .

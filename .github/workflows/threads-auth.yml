@@ -1,0 +1,41 @@
+name: Threads トークン取得
+on:
+  workflow_dispatch:
+    inputs:
+      url:
+        description: "許可したあとに開いたページのアドレス(https://kirei-ne.com/?code=... をまるごと貼り付け)"
+        required: true
+permissions:
+  contents: write
+jobs:
+  auth:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+      - name: Exchange code for long-lived token
+        env:
+          URL_IN: ${{ github.event.inputs.url }}
+          TH_APP_SECRET: ${{ secrets.TH_APP_SECRET }}
+          TH_APP_ID: "1417000310548547"
+        run: |
+          set -e
+          code=$(python3 -c "import os,urllib.parse as u;q=u.urlparse(os.environ['URL_IN'].strip());print(u.parse_qs(q.query).get('code',[''])[0].split('#')[0])")
+          echo "::add-mask::$code"
+          [ -n "$code" ] || { echo "::error::アドレスに code= が見つかりません"; exit 1; }
+          [ -n "$TH_APP_SECRET" ] || { echo "::error::TH_APP_SECRET が未設定です"; exit 1; }
+          r=$(curl -s -X POST https://graph.threads.net/oauth/access_token \
+              -d client_id=$TH_APP_ID --data-urlencode client_secret="$TH_APP_SECRET" \
+              -d grant_type=authorization_code --data-urlencode redirect_uri=https://kirei-ne.com/ --data-urlencode code="$code")
+          short=$(echo "$r" | jq -r '.access_token // empty'); echo "::add-mask::$short"
+          [ -n "$short" ] || { echo "::error::短期トークン取得失敗: $(echo "$r" | jq -c '.error // .' | cut -c1-300)"; exit 1; }
+          r2=$(curl -s -G https://graph.threads.net/access_token -d grant_type=th_exchange_token \
+              --data-urlencode client_secret="$TH_APP_SECRET" --data-urlencode access_token="$short")
+          long=$(echo "$r2" | jq -r '.access_token // empty'); echo "::add-mask::$long"
+          [ -n "$long" ] || { echo "::error::長期トークン取得失敗: $(echo "$r2" | jq -c '.error // .' | cut -c1-300)"; exit 1; }
+          echo "expires_in: $(echo "$r2" | jq -r .expires_in)"
+          me=$(curl -s -G https://graph.threads.net/v1.0/me -d fields=id,username --data-urlencode access_token="$long")
+          echo "connected: $(echo "$me" | jq -r .username)"
+          mkdir -p ig/threads
+          printf %s "$long" | openssl enc -aes-256-cbc -pbkdf2 -iter 200000 -salt -a -A -pass env:TH_APP_SECRET -out ig/threads/token.enc
+          git config user.name "kireine-bot"; git config user.email "info@kirei-ne.com"
+          git add ig/threads/token.enc && git commit -qm "threads: token (encrypted)" && git pull -q --rebase && git push -q

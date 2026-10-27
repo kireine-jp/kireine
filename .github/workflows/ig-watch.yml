@@ -12,10 +12,14 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v5
+      - name: Load Threads token
+        env:
+          TH_TOKEN: ${{ secrets.TH_TOKEN }}
+          TH_APP_SECRET: ${{ secrets.TH_APP_SECRET }}
+        run: bash tools/ig/th_env.sh
       - name: Check new comments
         env:
           IG_TOKEN: ${{ secrets.IG_TOKEN }}
           IG_USER_ID: ${{ secrets.IG_USER_ID }}
-          TH_TOKEN: ${{ secrets.TH_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: python3 tools/ig/comments.py
