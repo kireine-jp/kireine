@@ -1,0 +1,28 @@
+name: Threads 投稿
+on:
+  schedule:
+    - cron: "7 23 * * *"   # 毎日 8:07 JST
+    - cron: "7 12 * * *"   # 毎日 21:07 JST
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency: ig-post
+jobs:
+  post:
+    if: vars.THREADS_AUTO != 'off'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with: { python-version: "3.12" }
+      - name: Post next
+        env:
+          TH_TOKEN: ${{ secrets.TH_TOKEN }}
+          TH_USER_ID: ${{ secrets.TH_USER_ID }}
+        run: python3 tools/ig/threads_post.py .
+      - name: Save record
+        if: always()
+        run: |
+          git config user.name "kireine-bot"; git config user.email "info@kirei-ne.com"
+          git add ig/threads/posted.json 2>/dev/null || true
+          git diff --cached --quiet || (git commit -qm "threads: posted" && git pull -q --rebase && git push -q)
