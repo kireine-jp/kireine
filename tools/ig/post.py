@@ -19,26 +19,35 @@ def call(method, path, **params):
         with urllib.request.urlopen(req, timeout=60) as r:
             return json.load(r)
     except urllib.error.HTTPError as e:
-        sys.exit(f"API error {path}: {e.code} {e.read().decode()[:500]}")
+        fail(f"API error {path}: {e.code} {e.read().decode()[:500]}")
 
-def wait_public(url, tries=20):
+def fail(msg):
+    print(f"::error::{msg}"); sys.exit(1)
+
+UA = {"User-Agent": "Mozilla/5.0 (compatible; kireine-bot/1.0; +https://kirei-ne.com)"}
+def wait_public(url, tries=12):
+    last = ""
     for i in range(tries):
         try:
-            with urllib.request.urlopen(urllib.request.Request(url, method="HEAD"), timeout=30) as r:
-                if r.status == 200 and "image/jpeg" in r.headers.get("Content-Type", ""):
+            with urllib.request.urlopen(urllib.request.Request(url, headers=UA), timeout=30) as r:
+                ct = r.headers.get("Content-Type", "")
+                if r.status == 200 and "image/jpeg" in ct:
                     return
-        except Exception:
-            pass
-        print(f"waiting for deploy: {url} ({i+1}/{tries})"); time.sleep(30)
-    sys.exit(f"image not public: {url}")
+                last = f"{r.status} {ct}"
+        except urllib.error.HTTPError as e:
+            last = f"HTTP {e.code}"
+        except Exception as e:
+            last = repr(e)[:200]
+        print(f"waiting for deploy: {url} -> {last} ({i+1}/{tries})", flush=True); time.sleep(20)
+    fail(f"image not public: {url} ({last})")
 
 def wait_ready(cid):
     for _ in range(10):
         s = call("GET", cid, fields="status_code").get("status_code")
         if s == "FINISHED": return
-        if s in ("ERROR", "EXPIRED"): sys.exit(f"container {cid} {s}")
+        if s in ("ERROR", "EXPIRED"): fail(f"container {cid} {s}")
         time.sleep(15)
-    sys.exit(f"container {cid} not ready")
+    fail(f"container {cid} not ready")
 
 pick = os.environ.get("IG_DIR", "").strip()
 dirs = sorted(d for d in os.listdir(base) if os.path.isdir(os.path.join(base, d)) and not os.path.exists(os.path.join(base, d, "posted.json")))
@@ -57,7 +66,7 @@ print("post", name, len(urls), "images")
 for u in urls: wait_public(u)
 if DRY:
     print("DRY_RUN ok"); sys.exit(0)
-if not TOKEN or not UID: sys.exit("IG_TOKEN / IG_USER_ID が未設定です")
+if not TOKEN or not UID: fail("IG_TOKEN / IG_USER_ID が未設定です")
 
 children = []
 for u in urls:
