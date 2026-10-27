@@ -1,7 +1,7 @@
-name: Instagram 投稿
+name: Instagram・Threads 投稿
 on:
   schedule:
-    - cron: "7 11 * * 2,5"   # 火・金 20:07 JST
+    - cron: "7 11 * * 2,4,6"   # 火・木・土 20:07 JST
   workflow_dispatch:
     inputs:
       dir:
@@ -23,9 +23,12 @@ jobs:
         env:
           IG_TOKEN: ${{ secrets.IG_TOKEN }}
           IG_USER_ID: ${{ secrets.IG_USER_ID }}
+          TH_TOKEN: ${{ secrets.TH_TOKEN }}
+          TH_USER_ID: ${{ secrets.TH_USER_ID }}
           IG_DIR: ${{ github.event.inputs.dir }}
         run: python3 tools/ig/post.py .
       - name: Save posted.json
+        if: always()
         run: |
           git config user.name "kireine-bot"; git config user.email "info@kirei-ne.com"
           git add ig/*/posted.json
