@@ -1,3 +1,5 @@
+/ig/*
+  X-Robots-Tag: noindex
 /tools/*
   X-Robots-Tag: noindex
 /data/*

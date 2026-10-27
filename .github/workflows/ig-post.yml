@@ -1,0 +1,32 @@
+name: Instagram 投稿
+on:
+  schedule:
+    - cron: "7 11 * * 2,5"   # 火・金 20:07 JST
+  workflow_dispatch:
+    inputs:
+      dir:
+        description: "投稿するフォルダ名 (空欄なら一番古い未投稿)"
+        required: false
+permissions:
+  contents: write
+concurrency: ig-post
+jobs:
+  post:
+    # 自動投稿は リポジトリ変数 IG_AUTO=true のときだけ。手動実行はいつでも可
+    if: github.event_name == 'workflow_dispatch' || vars.IG_AUTO == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - name: Post carousel
+        env:
+          IG_TOKEN: ${{ secrets.IG_TOKEN }}
+          IG_USER_ID: ${{ secrets.IG_USER_ID }}
+          IG_DIR: ${{ github.event.inputs.dir }}
+        run: python3 tools/ig/post.py .
+      - name: Save posted.json
+        run: |
+          git config user.name "kireine-bot"; git config user.email "info@kirei-ne.com"
+          git add ig/*/posted.json
+          git diff --cached --quiet || (git commit -m "ig: posted" && git pull --rebase && git push)

@@ -1,0 +1,24 @@
+name: Instagram トークン更新
+on:
+  schedule:
+    - cron: "23 2 1,15 * *"   # 毎月1日・15日
+  workflow_dispatch:
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Refresh long-lived token (60日延長)
+        env:
+          IG_TOKEN: ${{ secrets.IG_TOKEN }}
+          GH_TOKEN: ${{ secrets.GH_PAT }}
+        run: |
+          set -e
+          r=$(curl -sf "https://graph.instagram.com/refresh_access_token?grant_type=ig_refresh_token&access_token=$IG_TOKEN")
+          new=$(echo "$r" | jq -r .access_token); echo "::add-mask::$new"
+          echo "expires_in: $(echo "$r" | jq -r .expires_in)"
+          test -n "$new" -a "$new" != null
+          if [ "$new" != "$IG_TOKEN" ]; then
+            test -n "$GH_TOKEN" || { echo "::error::新しいトークンを保存するには GH_PAT が必要です"; exit 1; }
+            gh secret set IG_TOKEN --repo "$GITHUB_REPOSITORY" --body "$new"
+            echo "IG_TOKEN updated"
+          fi

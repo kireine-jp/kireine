@@ -107,7 +107,7 @@ open(f"{OUT}/robots.txt", "w").write(f"User-agent: *\nAllow: /\nSitemap: {SITE}/
 urls = [""] + sorted(seo_urls) + ["about.html", "terms.html", "privacy.html", "contact.html"]
 open(f"{OUT}/sitemap.xml", "w").write('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' +
     "".join(f"<url><loc>{SITE}/{u}</loc><lastmod>{today}</lastmod></url>\n" for u in urls) + "</urlset>\n")
-open(f"{OUT}/_headers", "w").write("/tools/*\n  X-Robots-Tag: noindex\n/data/*\n  Cache-Control: public, max-age=600\n  X-Robots-Tag: noindex\n/*\n  X-Content-Type-Options: nosniff\n  Referrer-Policy: strict-origin-when-cross-origin\n")
+open(f"{OUT}/_headers", "w").write("/tools/*\n  X-Robots-Tag: noindex\n/ig/*\n  X-Robots-Tag: noindex\n/data/*\n  Cache-Control: public, max-age=600\n  X-Robots-Tag: noindex\n/*\n  X-Content-Type-Options: nosniff\n  Referrer-Policy: strict-origin-when-cross-origin\n")
 import shutil
 for f in ("favicon.svg", "og.png", "apple-touch-icon.png"):
     shutil.copy(f"{HERE}/{f}", f"{OUT}/{f}")
