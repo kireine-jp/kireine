@@ -74,6 +74,7 @@ def page(slug, title, body):
 <title>{title}｜キレイネ</title>
 <link rel="canonical" href="{SITE}/{slug}.html">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Noto+Serif+JP:wght@500;600&display=swap">
 <style>{css}</style>
 </head>
 <body>

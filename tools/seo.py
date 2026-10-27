@@ -80,7 +80,8 @@ def generate(OUT, clinics, prices, updates, groups, css, SITE):
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <meta property="og:type" content="article"><meta property="og:site_name" content="キレイネ"><meta property="og:title" content="{esc(title)}"><meta property="og:description" content="{esc(desc)}"><meta property="og:url" content="{url}"><meta property="og:image" content="{SITE}/og.png"><meta name="twitter:card" content="summary_large_image">
 <script type="application/ld+json">{json.dumps(ld, ensure_ascii=False)}</script>
-{extra_head}<style>{css}</style>
+{extra_head}<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Noto+Serif+JP:wght@500;600&display=swap">
+<style>{css}</style>
 </head>
 <body>
 <header><a class="logo" href="/"><i>¥</i>キレイネ<small>美容医療の料金比較</small></a></header>
