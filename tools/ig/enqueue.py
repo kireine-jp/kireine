@@ -51,6 +51,8 @@ while True:
         print("already generated today:", name); break
     script = "reel.py" if kind == "reel" else "cards.py"
     subprocess.run([sys.executable, os.path.join(repo, "tools/ig", script), repo, out, topic], check=True)
+    if kind == "card" and topic in ROT["reel"]:   # Threads用テキスト(リール側は reel.py が書く)
+        subprocess.run([sys.executable, os.path.join(repo, "tools/ig/reel.py"), repo, out, topic, "--text-only"], check=True)
     preview(out, name, kind)
     json.dump({"seq": max([meta(x).get("seq", 0) for x in dirs] + [0]) + 1, "kind": kind, "topic": topic, "created": today},
               open(os.path.join(out, "meta.json"), "w"), ensure_ascii=False)

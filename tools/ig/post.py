@@ -93,6 +93,9 @@ def threads_text(caption):
 
 def post_threads(imgs, video, caption):
     text, tag = threads_text(caption)
+    tf = os.path.join(d, "threads.txt")   # Threads向けの本文(会話調・TOP5・リンク)があれば優先
+    if os.path.exists(tf):
+        text = open(tf, encoding="utf-8").read().strip()[:490]
     extra = {"topic_tag": tag} if tag else {}
     if video:
         cid = th("POST", f"{TH_UID}/threads", media_type="VIDEO", video_url=video, text=text, **extra)["id"]

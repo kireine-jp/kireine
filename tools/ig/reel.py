@@ -38,6 +38,7 @@ def rows(cat, origins=None):
         seen.add(p["clinicId"]); out.append(p)
     return out
 
+TEXT_ONLY = "--text-only" in sys.argv
 T = {
     "botox-tokyo": dict(cat="wrinkle", origins={"korea", "allergan", "allergan_unclear"}, name="ボトックス", unit="シワ1部位",
                         tags="#ボトックス #ボトックス注射 #美容皮膚科 #東京美容 #美容医療 #美容垢 #プチ整形 #美容好きな人と繋がりたい"),
@@ -48,6 +49,7 @@ T = {
     "spot-tokyo": dict(cat="ipl", origins=None, name="フォトフェイシャル", unit="顔全体1回",
                        tags="#フォトフェイシャル #シミ取り #美容皮膚科 #東京美容 #美容医療 #美容垢 #肌管理"),
 }[TOPIC]
+T["url"] = "https://kirei-ne.com/tokyo/" + {"botox-tokyo": "botox", "filler-tokyo": "filler", "booster-tokyo": "booster", "spot-tokyo": "spot"}[TOPIC] + "/"
 R = rows(T["cat"], T["origins"])
 vals = [p["_u"] for p in R]
 lo, hi, med = vals[0], vals[-1], statistics.median(vals)
@@ -109,6 +111,20 @@ def cta():
 <p class="up" style="animation-delay:.3s;font-size:50px;margin-top:60px;line-height:1.6">全国のクリニックの料金比較は<br>プロフィールのリンクから</p>
 <div class="pop" style="animation-delay:.6s;margin-top:60px;background:{PAPER};color:{INK};border-radius:999px;padding:34px 50px;font-size:54px;font-weight:700;align-self:flex-start">kirei-ne.com</div>
 <p class="fade" style="animation-delay:.9s;font-size:28px;margin-top:70px;opacity:.8;line-height:1.7">{dlabel}時点・各院公式サイトの税込通常価格。最新情報・リスクは各院にご確認ください。広告費は受け取っていません。</p></div></body></html>''')
+
+def threads_text():
+    lines = [f"東京の{T['name']}、同じ「{T['unit']}」でも公式料金は ¥{yen(lo)}〜¥{yen(hi)}。", "", "安い順TOP5"]
+    lines += [f"{i+1}位 {C[p['clinicId']]['name']}({where(C[p['clinicId']])}) ¥{yen(p['_u'])}" for i, p in enumerate(top)]
+    lines += ["", f"東京の相場(掲載{len(R)}院の中央値)は ¥{yen(round(med, -2))}。", "みんなはいくらで受けた？", "", f"全院の比較 → {T['url']}",
+              f"※{dlabel}時点・公式サイトの税込通常価格。製剤・量は院により異なります。"]
+    t = "\n".join(lines)
+    k = 3 + len(top)                                     # 500字制限(絵文字なし)に収まるまで下位を削る
+    while len(t) > 490 and k > 5:
+        k -= 1; lines.pop(k); lines[2] = f"安い順TOP{k-3}"; t = "\n".join(lines)
+    return t
+open(f"{OUT}/threads.txt", "w", encoding="utf-8").write(threads_text())
+if TEXT_ONLY:
+    print("ok threads text", OUT); sys.exit(0)
 
 scenes = [(hook(), 3.0)] + [(rank(i, p), 1.7) for i, p in enumerate(reversed(top))] + [(souba(), 2.6), (cta(), 2.8)]
 
