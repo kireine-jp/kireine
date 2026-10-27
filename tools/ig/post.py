@@ -159,6 +159,9 @@ if "ig" not in posted:
     except ApiError as e:
         errors.append(f"Instagram {e}")
 
+if TH_TOKEN and not TH_UID and "threads" not in posted:   # ユーザーIDはトークンから自動取得
+    try: TH_UID = th("GET", "me", fields="id")["id"]
+    except ApiError as e: errors.append(f"Threads me {e}")
 if TH_TOKEN and TH_UID and "threads" not in posted:
     try:
         posted["threads"] = post_threads(imgs, video, caption) | {"posted_at": time.strftime("%Y-%m-%dT%H:%M:%S%z")}
