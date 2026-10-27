@@ -590,7 +590,7 @@ function renderTop(v){
   }
 }
 function renderTabs(){
-  const T=[["home","ホーム",IC.home],["compare","料金比較",IC.compare],["likes","お気に入り",IC.heart],["my","マイページ",IC.user]];
+  const T=[["home","ホーム",IC.home],["compare","料金比較",IC.compare],["likes","お気に入り",IC.heart],["my",PUBLIC?"メニュー":"マイページ",PUBLIC?IC.menu:IC.user]];
   $("#tabbar").innerHTML=T.map(t=>'<button data-tab="'+t[0]+'"'+(S.tab===t[0]?' aria-current="page"':'')+'>'+t[2]+'<span>'+t[1]+'</span></button>').join("");
 }
 function skeleton(){return '<div class="sk" style="height:46px"></div><div class="sk" style="height:132px;border-radius:20px"></div><div class="igrid">'+"<div class='sk' style='height:70px'></div>".repeat(5)+'</div><div class="sk" style="height:150px"></div><div class="sk" style="height:96px"></div>'}
@@ -807,6 +807,15 @@ function vReport(){
 }
 const myInitial=()=>(S.me.name||"ゲ").trim().charAt(0);
 function vMy(){
+  if(PUBLIC){   /* 公開サイト: 会員機能なし → 「メニュー」として表示 */
+    const nl=S.likes.filter(id=>S.clinics[id]).length,nr=S.recent.filter(id=>S.clinics[id]).length,nc=Object.keys(S.clinics).length;
+    let h='<section><h1 style="margin-bottom:4px">メニュー</h1><p class="small muted" style="margin:0">お気に入り・最近見たクリニックは、この端末のブラウザに保存されます。</p></section>';
+    h+='<div class="mstats"><button data-tab="likes"><b>'+nl+'</b><span>お気に入り</span></button><button data-go="recent"><b>'+nr+'</b><span>最近見た</span></button><button data-go="info"><b>'+nc+'</b><span>掲載クリニック</span></button></div>';
+    h+='<section><div class="sh"><h2>探す</h2></div><div class="menu"><button data-search>施術・クリニック・エリアで検索</button><button data-tab="compare">料金比較</button><a href="/tokyo/">東京のエリア別料金</a><a href="/osaka/">大阪のエリア別料金</a></div></section>';
+    h+='<section><div class="sh"><h2>キレイネについて</h2></div><div class="menu"><button data-go="info">運営ログ・掲載ルール</button><a href="/about.html">運営者情報</a><a href="/contact.html">お問い合わせ・掲載情報の修正依頼</a><a href="/terms.html">利用規約</a><a href="/privacy.html">プライバシーポリシー</a></div></section>';
+    h+='<section><div class="sh"><h2>SNS</h2></div><div class="menu"><a href="https://www.instagram.com/kireine_jp/" target="_blank" rel="noopener">Instagram @kireine_jp</a><a href="https://www.threads.com/@kireine_jp" target="_blank" rel="noopener">Threads @kireine_jp</a></div></section>';
+    h+='<div class="note">ご予約は各クリニックの公式サイト・電話で直接お申し込みください。キレイネは予約の取り次ぎを行っていません。</div>';
+    return h}
   const myRevs=S.reviews.filter(r=>S.uid&&r.author===S.uid);
   let h='<section class="me"><span class="av" style="background:linear-gradient(135deg,var(--accent),var(--accent-2))">'+esc(myInitial())+'</span><div><b>'+(S.uid?esc(S.me.name||"ログイン中")+' さん':'ゲスト')+'</b><span class="small muted">'+(S.uid?(BOOKING?'予約リクエスト・口コミ・お気に入りを管理できます':'口コミ・お気に入りを管理できます'):(PUBLIC?'お気に入り・最近見たクリニックはこの端末に保存されます':BOOKING?'予約リクエストと口コミの投稿にはログインが必要です':'口コミの投稿にはログインが必要です'))+'</span></div></section>';
   if(!BOOKING){const nr=S.recent.filter(id=>S.clinics[id]).length;
