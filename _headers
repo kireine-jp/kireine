@@ -1,6 +1,6 @@
-/ig/*
-  X-Robots-Tag: noindex
 /tools/*
+  X-Robots-Tag: noindex
+/ig/*
   X-Robots-Tag: noindex
 /data/*
   Cache-Control: public, max-age=600

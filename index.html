@@ -533,7 +533,7 @@ const STAT=[["hair","医療脱毛",61.2],["botox","ボツリヌス注入",55.7],
 const ORIGIN={allergan:"アラガン",korea:"韓国製",unknown:"製剤記載なし",other:"その他製剤",allergan_unclear:"メーカー記載なし"};
 const COND={"初回":"初回","2回目以降":"2回目以降","モニター":"モニター","キャンペーン":"キャンペーン"};
 const PREFS="北海道 青森県 岩手県 宮城県 秋田県 山形県 福島県 茨城県 栃木県 群馬県 埼玉県 千葉県 東京都 神奈川県 新潟県 富山県 石川県 福井県 山梨県 長野県 岐阜県 静岡県 愛知県 三重県 滋賀県 京都府 大阪府 兵庫県 奈良県 和歌山県 鳥取県 島根県 岡山県 広島県 山口県 徳島県 香川県 愛媛県 高知県 福岡県 佐賀県 長崎県 熊本県 大分県 宮崎県 鹿児島県 沖縄県".split(" ");
-const KW=["ボトックス","エラ","医療脱毛","全身脱毛","リジュラン","ヒアルロン酸","フォトフェイシャル","湘南美容クリニック","TCB","銀座"];
+const KW=["ボトックス","エラ","医療脱毛","リジュラン","ヒアルロン酸","銀座 ボトックス","新宿","渋谷 脱毛","大阪","湘南美容クリニック"];
 const AVC=["#9A554D","#76658F","#4F7486","#5F7D68","#8C6A45","#87495A","#5E5276","#4A7370","#8A5A45","#56688C"];
 const DISC="料金は各クリニック公式サイトの掲載額です。最終的な金額・適応は医師の診察で決まり、院ごとの違い・初診料・麻酔代などが別途かかる場合があります。施術の情報は一般的な目安で、効果や経過には個人差があります。本アプリはクリニックから掲載料・広告費を受け取っておらず、並び順は料金のみで決めています。";
 
@@ -744,17 +744,35 @@ function vInfo(){
   h+='<div class="note">'+DISC+'</div>';
   return h;
 }
+/* 検索: 全角半角・ひらがな/カタカナを同一視、地名の読み(ぎんざ→銀座)、スペース区切りAND */
+const kata=s=>String(s||"").normalize("NFKC").toLowerCase().replace(/[ぁ-ゖ]/g,c=>String.fromCharCode(c.charCodeAt(0)+96));
+const YOMI={"ギンザ":"銀座","シンジュク":"新宿","シブヤ":"渋谷","イケブクロ":"池袋","エビス":"恵比寿","オモテサンドウ":"表参道","アオヤマ":"青山","ロッポンギ":"六本木","アカサカ":"赤坂","アザブ":"麻布","ウエノ":"上野","キンシチョウ":"錦糸町","ゴタンダ":"五反田","シナガワ":"品川","メグロ":"目黒","ハラジュク":"原宿","キチジョウジ":"吉祥寺","タチカワ":"立川","マチダ":"町田","ジユウガオカ":"自由が丘","フタコタマガワ":"二子玉川","サンゲンジャヤ":"三軒茶屋","キタセンジュ":"北千住","アサクサ":"浅草","ヒロオ":"広尾","ナカノ":"中野","オオミヤ":"大宮","ヨコハマ":"横浜","ウメダ":"梅田","シンサイバシ":"心斎橋","ナンバ":"難波","テンジン":"天神","ハカタ":"博多","サカエ":"栄","ナゴヤ":"名古屋","サッポロ":"札幌","センダイ":"仙台","ヒロシマ":"広島","サンノミヤ":"三宮","コウベ":"神戸","キョウト":"京都","トウキョウ":"東京","オオサカ":"大阪","フクオカ":"福岡","アイチ":"愛知","カナガワ":"神奈川","ホッカイドウ":"北海道","ミヤギ":"宮城","ヒョウゴ":"兵庫","サイタマ":"埼玉","チバ":"千葉","ミナト":"港区","チュウオウ":"中央区","セタガヤ":"世田谷","ネリマ":"練馬","スミダ":"墨田","アダチ":"足立","ムサシノ":"武蔵野",
+ "ボトックス":"ボトックス","ヒアル":"ヒアルロン酸","ダツモウ":"脱毛","シミ":"シミ"};
+const ALIAS={"エラ":"botox","小顔":"botox","シワ":"botox","脱毛":"hair","ワキ":"hair","vio":"hair","全身":"hair","フォト":"spot","シミ":"spot","ipl":"spot","肌育":"booster","サーモン":"booster","涙袋":"filler","ほうれい":"filler","ヒアル":"filler"};
+function expand(t){const k=kata(t);if(YOMI[k])return [k,kata(YOMI[k])];const hit=Object.keys(YOMI).find(y=>y.length>=3&&y.startsWith(k)&&k.length>=2);return hit?[k,kata(YOMI[hit])]:[k]}
 function vSearch(){
-  const q=S.q.trim().toLowerCase();
-  let h='<label class="sbar">'+IC.search+'<input id="q" type="search" placeholder="施術名・クリニック名で探す" value="'+esc(S.q)+'" aria-label="検索" autocomplete="off"></label>';
-  if(!q)return h+'<section><div class="sh"><h3>人気のキーワード</h3></div><div class="kw">'+KW.map(k=>'<button data-kw="'+esc(k)+'">'+esc(k)+'</button>').join("")+'</div></section>';
-  const gs=GROUPS.filter(g=>[g.name,g.short,...g.subs.map(s=>s[1])].some(f=>f.toLowerCase().includes(q))||(q.includes("脱毛")&&g.id==="hair")||(q.includes("エラ")&&g.id==="botox")||(q.includes("フォト")&&g.id==="spot"));
-  const cids=Object.keys(S.clinics).filter(id=>{const c=S.clinics[id];return [c.name,c.area,c.pref,c.address].some(f=>String(f||"").toLowerCase().includes(q))});
-  const ps=S.prices.filter(p=>p.product.toLowerCase().includes(q)).sort((a,b)=>a.price-b.price).slice(0,20);
+  const raw=S.q.trim();
+  let h='<label class="sbar">'+IC.search+'<input id="q" type="search" placeholder="施術名・クリニック名・エリアで探す" value="'+esc(S.q)+'" aria-label="検索" autocomplete="off" enterkeyhint="search"></label>';
+  if(!raw)return h+'<section><div class="sh"><h3>人気のキーワード</h3></div><div class="kw">'+KW.map(k=>'<button data-kw="'+esc(k)+'">'+esc(k)+'</button>').join("")+'</div></section>';
+  const toks=raw.split(/[\s　]+/).filter(Boolean).map(expand);           // 各トークンは候補の配列(どれか一致でOK)
+  const hit=(f,alts)=>alts.some(a=>kata(f).includes(a));
+  const gHit=(g,alts)=>alts.some(a=>[g.name,g.short,...g.subs.map(x=>x[1])].some(f=>kata(f).includes(a))||Object.entries(ALIAS).some(([k,v])=>v===g.id&&a.includes(kata(k))));
+  const tg=toks.map(alts=>GROUPS.filter(g=>gHit(g,alts)));                  // トークンごとの施術一致
+  const gs=[...new Set(tg.flat())];
+  const cf=c=>[c.name,c.area,c.pref,c.address,c.station];
+  const restToks=toks.filter((_,i)=>!tg[i].length);                         // 施術以外のトークン(エリア・院名)
+  const catsOf=new Set(gs.flatMap(g=>g.subs.map(x=>x[0])));
+  let cids=Object.keys(S.clinics).filter(id=>{const c=S.clinics[id];return restToks.length?restToks.every(alts=>cf(c).some(f=>hit(f,alts))):false});
+  if(gs.length&&restToks.length)cids=cids.filter(id=>S.prices.some(p=>p.clinicId===id&&catsOf.has(p.cat)));
+  let ps=S.prices.filter(p=>{const c=S.clinics[p.clinicId];if(!c)return false;
+    const okT=gs.length?catsOf.has(p.cat):toks.some(alts=>hit(p.product,alts));
+    const okR=restToks.length?restToks.every(alts=>cf(c).some(f=>hit(f,alts))||hit(p.product,alts)):true;
+    return okT&&okR&&(gs.length||restToks.length)});
+  ps=ps.sort((a,b)=>a.price-b.price).slice(0,30);
   if(gs.length)h+='<section><div class="sh"><h3>施術</h3></div><div class="kw">'+gs.map(g=>'<button data-guide="'+g.id+'">'+esc(g.name)+' ›</button>').join("")+'</div></section>';
   if(cids.length)h+='<section><div class="sh"><h3>クリニック</h3></div><div class="clist">'+cids.map(clinicCard).join("")+'</div></section>';
-  if(ps.length)h+='<section><div class="sh"><h3>料金</h3></div><div class="plist">'+ps.map(p=>priceCard(p,null,false)).join("")+'</div></section>';
-  if(!gs.length&&!cids.length&&!ps.length)h+='<div class="empty">'+IC.empty+'<span>「'+esc(S.q.trim())+'」に一致する結果がありません</span></div>';
+  if(ps.length&&(restToks.length||!gs.length))h+='<section><div class="sh"><h3>料金</h3></div><div class="plist">'+ps.map(p=>priceCard(p,null,false)).join("")+'</div></section>';
+  if(!gs.length&&!cids.length&&!ps.length)h+='<div class="empty">'+IC.empty+'<span>「'+esc(raw)+'」に一致する結果がありません<br><small>例: 銀座 ボトックス / しぶや / ヒアル</small></span></div>';
   return h;
 }
 
@@ -885,7 +903,9 @@ function bind(){
   const fpr=$("#f-promo");if(fpr)fpr.onclick=()=>{S.cmp.promo=!S.cmp.promo;render()};
   const fl=$("#f-local");if(fl)fl.onclick=()=>{S.cmp.localOnly=!S.cmp.localOnly;render()};
   const fs=$("#f-sort");if(fs)fs.onclick=()=>{S.cmp.sort=S.cmp.sort==="unit"?"price":"unit";render()};
-  const q=$("#q");if(q)q.oninput=()=>{clearTimeout(S.qt);S.qt=setTimeout(()=>{S.q=q.value;const pos=q.selectionStart;render();const n=$("#q");if(n){n.focus();try{n.setSelectionRange(pos,pos)}catch(e){}}},200)};
+  const q=$("#q");if(q){const run=()=>{clearTimeout(S.qt);S.qt=setTimeout(()=>{if(S.ime)return;S.q=q.value;const pos=q.selectionStart;render();const n=$("#q");if(n){n.focus();try{n.setSelectionRange(pos,pos)}catch(e){}}},250)};
+    q.addEventListener("compositionstart",()=>{S.ime=true;clearTimeout(S.qt)});q.addEventListener("compositionend",()=>{S.ime=false;run()});
+    q.oninput=e=>{if(e.isComposing||S.ime)return;run()};q.onkeydown=e=>{if(e.key==="Enter"&&!e.isComposing){S.ime=false;run();q.blur()}}}
   const rate=$("#rate");if(rate)rate.querySelectorAll("button").forEach(b=>b.onclick=()=>{$("#rv-rating").value=b.dataset.v;rate.querySelectorAll("button").forEach(x=>x.classList.toggle("on",+x.dataset.v<=+b.dataset.v))});
   const f=$("#rv-form");if(f)f.onsubmit=submitReview;
   document.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>{push({name:b.dataset.go});if(b.dataset.go==="admin")loadAdmin();if(b.dataset.go==="report")loadReport();if(b.dataset.go==="notice"){S.seenAt=Date.now();try{localStorage.setItem("bhp-seen",S.seenAt)}catch(e){}}});
