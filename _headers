@@ -1,5 +1,8 @@
+/tools/*
+  X-Robots-Tag: noindex
 /data/*
   Cache-Control: public, max-age=600
+  X-Robots-Tag: noindex
 /*
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin
