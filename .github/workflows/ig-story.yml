@@ -18,9 +18,11 @@ jobs:
       - uses: actions/setup-python@v6
         with: { python-version: "3.12" }
       - name: Install fonts and Chromium
+        timeout-minutes: 8
         run: |
-          sudo apt-get update -qq && sudo apt-get install -y -qq fonts-noto-cjk fonts-noto-cjk-extra >/dev/null
-          pip install -q playwright && python -m playwright install --with-deps chromium >/dev/null
+          export DEBIAN_FRONTEND=noninteractive
+          sudo -E apt-get install -y -qq --no-install-recommends fonts-noto-cjk >/dev/null
+          pip install -q playwright && python -m playwright install chromium >/dev/null
       - name: Render today's story
         id: r
         run: |
