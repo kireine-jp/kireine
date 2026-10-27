@@ -36,7 +36,7 @@ pre{{white-space:pre-wrap;background:#F6EEEC;padding:14px;border-radius:10px;fon
 today = datetime.date.today().isoformat()
 made = 0
 while True:
-    dirs = sorted((d for d in os.listdir(base) if os.path.isdir(os.path.join(base, d))), key=lambda d: (meta(d).get("seq", 0), d))
+    dirs = sorted((d for d in os.listdir(base) if d != "stories" and os.path.isdir(os.path.join(base, d))), key=lambda d: (meta(d).get("seq", 0), d))
     pend = [d for d in dirs if is_pending(d)]
     if len(pend) >= KEEP and not (force and made == 0):
         print(f"queue full ({len(pend)} pending): {pend}"); break
@@ -53,6 +53,7 @@ while True:
     subprocess.run([sys.executable, os.path.join(repo, "tools/ig", script), repo, out, topic], check=True)
     if kind == "card" and topic in ROT["reel"]:   # Threads用テキスト(リール側は reel.py が書く)
         subprocess.run([sys.executable, os.path.join(repo, "tools/ig/reel.py"), repo, out, topic, "--text-only"], check=True)
+    subprocess.run([sys.executable, os.path.join(repo, "tools/ig/newstory.py"), out], check=True)
     preview(out, name, kind)
     json.dump({"seq": max([meta(x).get("seq", 0) for x in dirs] + [0]) + 1, "kind": kind, "topic": topic, "created": today},
               open(os.path.join(out, "meta.json"), "w"), ensure_ascii=False)

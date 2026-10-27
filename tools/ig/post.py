@@ -130,7 +130,7 @@ def pending(n):
     return "ig" not in p or (TH_TOKEN and "threads" not in p and "threads_skip" not in p)
 
 pick = os.environ.get("IG_DIR", "").strip()
-dirs = sorted((x for x in os.listdir(base) if os.path.isdir(os.path.join(base, x))), key=lambda x: (seq(x), x))
+dirs = sorted((x for x in os.listdir(base) if x != "stories" and os.path.isdir(os.path.join(base, x))), key=lambda x: (seq(x), x))
 # 未投稿: IG未投稿のもの。Threadsだけ残っているものは直近1件のみ追いかける
 dirs = [x for x in dirs if pending(x)]
 if pick: dirs = [pick] if pick in dirs else []
@@ -156,6 +156,16 @@ if "ig" not in posted:
     try:
         posted["ig"] = post_instagram(imgs, video, cover, caption) | {"posted_at": time.strftime("%Y-%m-%dT%H:%M:%S%z")}
         save(); print("instagram published", posted["ig"]["permalink"], flush=True)
+        sn = os.path.join(d, "story_new.jpg")   # お知らせストーリー(失敗しても投稿本体は成功扱い)
+        if os.path.exists(sn):
+            try:
+                u = f"{SITE}/ig/{name}/story_new.jpg"; wait_public(u, "image/jpeg")
+                sc = ig("POST", f"{IG_UID}/media", media_type="STORIES", image_url=u)["id"]
+                wait_ready(ig_status, sc)
+                posted["ig_story"] = ig("POST", f"{IG_UID}/media_publish", creation_id=sc)["id"]; save()
+                print("instagram story published", flush=True)
+            except (Exception, SystemExit) as e:
+                print(f"::warning::story {e}")
     except ApiError as e:
         errors.append(f"Instagram {e}")
 

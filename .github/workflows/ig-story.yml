@@ -1,0 +1,46 @@
+name: 今日の最安 ストーリー・Threads
+on:
+  schedule:
+    - cron: "7 3 * * *"   # 毎日 12:07 JST
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency: ig-post
+jobs:
+  story:
+    # 止めたいときは リポジトリ変数 IG_STORY=off
+    if: vars.IG_STORY != 'off'
+    runs-on: ubuntu-24.04
+    env:
+      TZ: Asia/Tokyo
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with: { python-version: "3.12" }
+      - name: Install fonts and Chromium
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq fonts-noto-cjk fonts-noto-cjk-extra >/dev/null
+          pip install -q playwright && python -m playwright install --with-deps chromium >/dev/null
+      - name: Render today's story
+        id: r
+        run: |
+          D=$(date +%F); echo "day=$D" >> "$GITHUB_OUTPUT"
+          if [ -f "ig/stories/$D/posted.json" ]; then echo "already posted"; echo "skip=1" >> "$GITHUB_OUTPUT"; exit 0; fi
+          python3 tools/ig/story.py . "ig/stories/$D"
+          # 14日より古いストーリー画像は削除(投稿後は不要)
+          find ig/stories -mindepth 1 -maxdepth 1 -type d | sort | head -n -14 | xargs -r rm -rf
+          git config user.name "kireine-bot"; git config user.email "info@kirei-ne.com"
+          git add -A ig/stories && (git diff --cached --quiet || (git commit -qm "story: $D" && git pull -q --rebase && git push -q))
+      - name: Post
+        if: steps.r.outputs.skip != '1'
+        env:
+          IG_TOKEN: ${{ secrets.IG_TOKEN }}
+          IG_USER_ID: ${{ secrets.IG_USER_ID }}
+          TH_TOKEN: ${{ secrets.TH_TOKEN }}
+          TH_USER_ID: ${{ secrets.TH_USER_ID }}
+        run: python3 tools/ig/story_post.py . "${{ steps.r.outputs.day }}"
+      - name: Save record
+        if: always() && steps.r.outputs.skip != '1'
+        run: |
+          git add ig/stories/*/posted.json 2>/dev/null || true
+          git diff --cached --quiet || (git commit -qm "story: posted" && git pull -q --rebase && git push -q)
