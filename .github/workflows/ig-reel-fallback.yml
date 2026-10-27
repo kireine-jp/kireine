@@ -1,0 +1,41 @@
+name: リール自動投稿(当日未投稿のとき)
+on:
+  schedule:
+    - cron: "30 14 * * *"   # 毎日 23:30 JST/KST
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency: ig-post
+jobs:
+  fallback:
+    if: vars.REEL_FALLBACK != 'off'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+      - name: Load Threads token
+        env:
+          TH_TOKEN: ${{ secrets.TH_TOKEN }}
+          TH_APP_SECRET: ${{ secrets.TH_APP_SECRET }}
+        run: bash tools/ig/th_env.sh
+      - name: Check today
+        id: c
+        env:
+          IG_TOKEN: ${{ secrets.IG_TOKEN }}
+          IG_USER_ID: ${{ secrets.IG_USER_ID }}
+        run: |
+          python3 tools/ig/detect_manual.py || true
+          d=$(python3 tools/ig/reel_fallback.py); echo "dir=$d" >> "$GITHUB_OUTPUT"
+          [ -n "$d" ] && echo "今日はリール未投稿 → $d を投稿" || echo "今日はリール投稿済み、または未投稿リールなし"
+      - name: Post reel (no music)
+        if: steps.c.outputs.dir != ''
+        env:
+          IG_TOKEN: ${{ secrets.IG_TOKEN }}
+          IG_USER_ID: ${{ secrets.IG_USER_ID }}
+          IG_DIR: ${{ steps.c.outputs.dir }}
+        run: python3 tools/ig/post.py .
+      - name: Save record
+        if: always()
+        run: |
+          git config user.name "kireine-bot"; git config user.email "info@kirei-ne.com"
+          git add ig/*/posted.json 2>/dev/null || true
+          git diff --cached --quiet || (git commit -qm "ig: reel posted (fallback)" && git pull -q --rebase && git push -q)
