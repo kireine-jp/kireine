@@ -68,8 +68,20 @@ def rank_slide(kicker, title, rows, n, note):
 <div style="font-family:{SERIF};font-size:{58 if first else 50}px;font-weight:600;color:{ROSE if first else INK};white-space:nowrap">¥{yen(price)}</div></div>'''
     return frame(head(kicker, title, n) + f'<div style="flex:1">{lis}</div><p style="margin:0;font-size:23px;line-height:1.7;color:{MUTE}">{e(note)}</p>')
 
+FACES = os.path.join(os.path.dirname(os.path.abspath(__file__)), "faces")
+def face_img():
+    """tools/ig/faces/ の画像を日付で順番に使う(AI生成の人物・マスコット。効果や体験を示す用途には使わない)"""
+    import base64, zlib
+    fs = sorted(f for f in os.listdir(FACES) if f.lower().endswith((".jpg", ".jpeg", ".png"))) if os.path.isdir(FACES) else []
+    if not fs: return ""
+    f = fs[zlib.crc32((day + TOPIC).encode()) % len(fs)]
+    mime = "png" if f.lower().endswith(".png") else "jpeg"
+    b64 = base64.b64encode(open(os.path.join(FACES, f), "rb").read()).decode()
+    return (f'<img src="data:image/{mime};base64,{b64}" style="position:absolute;right:64px;top:150px;width:340px;height:340px;'
+            f'object-fit:cover;border-radius:50%;border:10px solid {PAPER};box-shadow:0 12px 40px rgba(59,42,44,.12)">')
+
 def cover(big, sub, chip):
-    return frame(f'''
+    return frame(face_img() + f'''
 <div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font-family:{SERIF};font-size:42px;letter-spacing:.16em">キレイネ</span><span style="font-size:28px;color:{MUTE}">{mlabel} 東京版</span></div>
 <div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:44px">
 <p style="margin:0;font-size:34px;color:{ROSE};letter-spacing:.04em">公式サイトの料金だけで比較</p>
