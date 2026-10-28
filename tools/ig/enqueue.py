@@ -31,13 +31,15 @@ def preview(out, name, kind):
                  '<button onclick="navigator.clipboard.writeText(document.querySelector(\'pre\').innerText).then(()=>this.textContent=\'コピーしました\')" style="padding:12px 18px;border-radius:999px;border:1px solid #3B2A2C;background:#fff">キャプションをコピー</button></p>')
     else:
         imgs = sorted(f for f in os.listdir(out) if f.endswith(".jpg"))
-        media = '<div class="g">' + "".join(f'<img src="{i}" alt="">' for i in imgs) + "</div>"
+        media = ('<div class="g">' + "".join(f'<img src="{i}" alt="">' for i in imgs) + "</div>"
+                 '<p>画像を長押し →「写真に保存」(01から順に)</p>'
+                 '<p><button onclick="navigator.clipboard.writeText(document.querySelector(\'pre\').innerText).then(()=>this.textContent=\'コピーしました\')" style="padding:12px 18px;border-radius:999px;border:1px solid #3B2A2C;background:#fff">キャプションをコピー</button></p>')
     open(os.path.join(out, "index.html"), "w", encoding="utf-8").write(f"""<!doctype html><html lang="ja"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex">
 <title>投稿プレビュー {name}</title><style>body{{margin:0;background:#FFFDFC;color:#3B2A2C;font-family:sans-serif;padding:16px}}
 .g{{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory}}.g img{{width:min(80vw,360px);border-radius:10px;scroll-snap-align:start;border:1px solid #EFE5E2}}
 pre{{white-space:pre-wrap;background:#F6EEEC;padding:14px;border-radius:10px;font-size:14px;line-height:1.6}}</style></head><body>
-<h3>{name}（{'リール' if kind == 'reel' else 'カルーセル'}）</h3>{media}<pre>{html.escape(cap)}</pre></body></html>""")
+<h3>{name}（{'リール' if kind in ('reel', 'screen') else 'カルーセル'}）</h3>{media}<pre>{html.escape(cap)}</pre></body></html>""")
 
 today = datetime.date.today().isoformat()
 made = 0
