@@ -9,7 +9,7 @@ base = "ig"
 norm = lambda s: re.sub(r"[\s#、。，,.!！?？…・「」『』()（）]+", "", s or "")[:15]
 q = urllib.parse.urlencode({"fields": "id,caption,permalink,timestamp,media_product_type", "limit": 25, "access_token": T})
 media = json.load(urllib.request.urlopen(f"https://graph.instagram.com/v26.0/{U}/media?{q}", timeout=60)).get("data", [])
-for m in media: print("media", m.get("timestamp"), m.get("media_product_type"), (m.get("caption") or "")[:30].replace("\n", " "))
+for m in media: print("::notice::media", m.get("timestamp"), m.get("media_product_type"), (m.get("caption") or "")[:30].replace("\n", " "))
 known = set()
 for d in os.listdir(base):
     try: known.add(json.load(open(os.path.join(base, d, "posted.json")))["ig"]["media_id"])
@@ -22,7 +22,7 @@ reels = [m for m in media if m.get("media_product_type") == "REELS" and m["id"] 
 def mark(d, m, how):
     json.dump({"ig": {"media_id": m["id"], "permalink": m.get("permalink", ""), "posted_at": m.get("timestamp"), "manual": True, "matched": how}},
               open(os.path.join(base, d, "posted.json"), "w"), ensure_ascii=False)
-    known.add(m["id"]); print("marked", d, how, m.get("permalink"))
+    known.add(m["id"]); print("::notice::marked", d, how, m.get("permalink"))
 for d in list(pend):
     cap = open(os.path.join(base, d, "caption.txt"), encoding="utf-8").read()
     hit = next((m for m in reels if m["id"] not in known and norm(m.get("caption")) and norm(m.get("caption")) == norm(cap)), None)
