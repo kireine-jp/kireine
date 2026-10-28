@@ -2,13 +2,14 @@
 """オーナーがアプリで手動投稿したリールを見つけて ig/<folder>/posted.json を書く。
 1) キャプション冒頭で照合 2) 照合できなければ、どのフォルダにも記録されていない新しいリールを古い未投稿リールに順に割り当て。
 env: IG_TOKEN, IG_USER_ID"""
-import json, os, re, urllib.parse, urllib.request, datetime
+import json, os, re, sys, datetime
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from iglist import list_media, is_reel
 T, U = os.environ.get("IG_TOKEN", ""), os.environ.get("IG_USER_ID", "")
 if not T: raise SystemExit(0)
 base = "ig"
 norm = lambda s: re.sub(r"[\s#、。，,.!！?？…・「」『』()（）]+", "", s or "")[:15]
-q = urllib.parse.urlencode({"fields": "id,caption,permalink,timestamp,media_product_type", "limit": 25, "access_token": T})
-media = json.load(urllib.request.urlopen(f"https://graph.instagram.com/v26.0/{U}/media?{q}", timeout=60)).get("data", [])
+media = list_media(U, T)
 for m in media: print("::notice::media", m.get("timestamp"), m.get("media_product_type"), (m.get("caption") or "")[:30].replace("\n", " "))
 known = set()
 for d in os.listdir(base):
@@ -18,7 +19,7 @@ def seq(d):
     try: return json.load(open(os.path.join(base, d, "meta.json")))["seq"]
     except Exception: return 0
 pend = sorted((d for d in os.listdir(base) if os.path.exists(os.path.join(base, d, "reel.mp4")) and not os.path.exists(os.path.join(base, d, "posted.json"))), key=lambda d: (seq(d), d))
-reels = [m for m in media if m.get("media_product_type") == "REELS" and m["id"] not in known]
+reels = [m for m in media if is_reel(m) and m["id"] not in known]
 def mark(d, m, how):
     json.dump({"ig": {"media_id": m["id"], "permalink": m.get("permalink", ""), "posted_at": m.get("timestamp"), "manual": True, "matched": how}},
               open(os.path.join(base, d, "posted.json"), "w"), ensure_ascii=False)
