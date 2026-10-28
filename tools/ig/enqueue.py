@@ -30,7 +30,7 @@ def preview(out, name, kind):
                  '<p><a href="reel.mp4" download style="display:inline-block;background:#3B2A2C;color:#fff;padding:12px 18px;border-radius:999px;text-decoration:none">動画を保存</a> '
                  '<button onclick="navigator.clipboard.writeText(document.querySelector(\'pre\').innerText).then(()=>this.textContent=\'コピーしました\')" style="padding:12px 18px;border-radius:999px;border:1px solid #3B2A2C;background:#fff">キャプションをコピー</button></p>')
     else:
-        imgs = sorted(f for f in os.listdir(out) if f.endswith(".jpg"))
+        imgs = sorted(f for f in os.listdir(out) if f.endswith(".jpg") and not f.startswith("story"))
         media = ('<div class="g">' + "".join(f'<img src="{i}" alt="">' for i in imgs) + "</div>"
                  '<p>画像を長押し →「写真に保存」(01から順に)</p>'
                  '<p><button onclick="navigator.clipboard.writeText(document.querySelector(\'pre\').innerText).then(()=>this.textContent=\'コピーしました\')" style="padding:12px 18px;border-radius:999px;border:1px solid #3B2A2C;background:#fff">キャプションをコピー</button></p>')
