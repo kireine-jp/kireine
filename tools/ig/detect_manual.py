@@ -20,6 +20,17 @@ def seq(d):
     except Exception: return 0
 pend = sorted((d for d in os.listdir(base) if os.path.exists(os.path.join(base, d, "reel.mp4")) and not os.path.exists(os.path.join(base, d, "posted.json"))), key=lambda d: (seq(d), d))
 reels = [m for m in media if is_reel(m) and m["id"] not in known]
+# オーナー確認済み(media_id 未取得)のフォルダは、キャプション一致で media_id を補完する
+for d in os.listdir(base):
+    pj = os.path.join(base, d, "posted.json")
+    try: rec = json.load(open(pj))
+    except Exception: continue
+    if rec.get("ig", {}).get("media_id") or not os.path.exists(os.path.join(base, d, "caption.txt")): continue
+    cap = norm(open(os.path.join(base, d, "caption.txt"), encoding="utf-8").read())
+    hit = next((m for m in reels if m["id"] not in known and cap and norm(m.get("caption")) == cap), None)
+    if hit:
+        rec["ig"].update(media_id=hit["id"], permalink=hit.get("permalink", ""), posted_at=hit.get("timestamp"))
+        json.dump(rec, open(pj, "w"), ensure_ascii=False); known.add(hit["id"]); print("::notice::filled", d)
 def mark(d, m, how):
     json.dump({"ig": {"media_id": m["id"], "permalink": m.get("permalink", ""), "posted_at": m.get("timestamp"), "manual": True, "matched": how}},
               open(os.path.join(base, d, "posted.json"), "w"), ensure_ascii=False)
