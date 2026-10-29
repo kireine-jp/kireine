@@ -84,7 +84,7 @@ def generate(OUT, clinics, prices, updates, groups, css, SITE):
 <style>{css}</style>
 </head>
 <body>
-<header><a class="logo" href="/"><i>¥</i>キレイネ<small>美容医療の料金比較</small></a></header>
+<header><a class="logo" href="/"><i>¥</i>キレイネ<small>美容医療の最安値を比較</small></a></header>
 <main>
 <nav class="bc" aria-label="パンくず">{bc}</nav>
 {body}

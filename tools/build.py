@@ -40,7 +40,7 @@ head = f"""<!doctype html>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>キレイネ｜美容医療の料金比較 ボトックス・ヒアルロン酸・リジュラン</title>
+<title>キレイネ｜美容医療の最安値を公式料金で比較 ボトックス・ヒアルロン酸・リジュラン</title>
 <meta name="description" content="{desc}">
 <link rel="canonical" href="{SITE}/">
 <meta name="theme-color" content="#e0306c">
@@ -48,7 +48,7 @@ head = f"""<!doctype html>
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="キレイネ">
-<meta property="og:title" content="キレイネ｜美容医療の料金比較">
+<meta property="og:title" content="キレイネ｜美容医療の最安値を公式料金で比較">
 <meta property="og:description" content="{desc}">
 <meta property="og:url" content="{SITE}/">
 <meta property="og:image" content="{SITE}/og.png">
@@ -78,7 +78,7 @@ def page(slug, title, body):
 <style>{css}</style>
 </head>
 <body>
-<header><a class="logo" href="/"><i>¥</i>キレイネ<small>美容医療の料金比較</small></a></header>
+<header><a class="logo" href="/"><i>¥</i>キレイネ<small>美容医療の最安値を比較</small></a></header>
 <main>
 <h1>{title}</h1>
 {body}

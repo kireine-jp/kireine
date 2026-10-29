@@ -1,4 +1,4 @@
-<title>キレイネ｜美容医療の料金比較</title>
+<title>キレイネ｜美容医療の最安値を公式料金で比較</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Noto+Serif+JP:wght@500;600&display=swap">
@@ -550,7 +550,7 @@ function renderTop(v){
     const ttl=v.name==="guide"?(GROUPS.find(g=>g.id===v.id)?.name||""):v.name==="clinic"?(S.clinics[v.id]?.name||""):v.name==="search"?"検索":v.name==="book"?"予約リクエスト":v.name==="mybook"?"予約リクエスト履歴":v.name==="admin"?"予約リクエスト管理":v.name==="report"?"送客レポート":v.name==="myrev"?"自分の口コミ":v.name==="info"?"アプリについて":v.name==="likes"?"お気に入り":v.name==="notice"?"お知らせ":v.name==="recent"?"最近見たクリニック":"";
     tb.innerHTML='<button class="back" data-pop aria-label="戻る">'+IC.back+'</button><span class="ttl">'+esc(ttl)+'</span><span class="spacer"></span>'+(v.name==="clinic"?'<button class="iconbtn heart" data-like="'+esc(v.id)+'" aria-pressed="'+isLiked(v.id)+'" aria-label="お気に入り">'+IC.heart+'</button>':'');
   }else{
-    tb.innerHTML='<button class="logo" data-tab="home"><img class="lm" src="/mascot.jpg" srcset="/mascot.jpg 1x, /mascot@2x.jpg 2x" alt="" width="36" height="36"><span class="lt"><b>キレイネ</b><small>公式料金だけで比べる美容医療</small></span></button><span class="spacer"></span><button class="iconbtn" data-search aria-label="検索">'+IC.search+'</button><button class="iconbtn bell" data-go="notice" aria-label="お知らせ">'+IC.bell+(notices().some(n=>n.at>S.seenAt)?'<i></i>':'')+'</button>';
+    tb.innerHTML='<button class="logo" data-tab="home"><img class="lm" src="/mascot.jpg" srcset="/mascot.jpg 1x, /mascot@2x.jpg 2x" alt="" width="36" height="36"><span class="lt"><b>キレイネ</b><small>美容医療の最安値を公式料金で比較</small></span></button><span class="spacer"></span><button class="iconbtn" data-search aria-label="検索">'+IC.search+'</button><button class="iconbtn bell" data-go="notice" aria-label="お知らせ">'+IC.bell+(notices().some(n=>n.at>S.seenAt)?'<i></i>':'')+'</button>';
   }
 }
 function renderTabs(){
@@ -579,7 +579,7 @@ function homeDeals(){
   return Object.values(best).sort((a,b)=>(g.subs.findIndex(s=>s[0]===a.cat)-g.subs.findIndex(s=>s[0]===b.cat))||key(a)-key(b))}
 function vHome(){
   const nC=Object.keys(S.clinics).length,nP=S.prices.length,u=S.updates[0];
-  let h='<section class="hero"><h1>きれいになる値段を、<br>正直に比べる。</h1><p>全国のクリニックの公式料金を毎朝チェック。<br>広告費は受け取っていません。</p>'+
+  let h='<section class="hero"><h1>美容医療の最安値が、<br>すぐわかる。</h1><p>全国のクリニックの公式料金を毎朝チェックして、<br>安い順に並べています。<br>広告費は受け取っていません。</p>'+
    '<button class="sbar" data-search>'+IC.search+'<span>エラボトックス、大阪だといくら?</span></button>'+
    '<div class="hstats"><div><b>'+nC+'</b><span>掲載クリニック</span></div><div><b>'+nP+'</b><span>公式料金</span></div><div><b>'+(u?esc(u.date.slice(5).replace("-","/")):"毎日")+'</b><span>最終更新</span></div></div></section>';
   const tabs=[["rec","おすすめ"]].concat(GROUPS.map(g=>[g.id,g.short]));
