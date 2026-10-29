@@ -413,6 +413,7 @@ h3{font-weight:600}
 .logo{font-family:var(--serif);font-weight:500;font-size:19px;letter-spacing:.14em}
 .logo i{display:none}
 .logo small{font-family:var(--sans);letter-spacing:0;font-weight:500}
+.logo{gap:10px;text-align:left}.logo .lm{width:36px;height:36px;border-radius:50%;object-fit:cover;box-shadow:0 0 0 2px #fff,0 0 0 3px var(--line)}.logo .lt{display:flex;flex-direction:column;line-height:1.15}.logo .lt b{font-weight:500;font-size:20px;letter-spacing:.14em}.logo .lt small{margin:2px 0 0;font-size:10.5px;letter-spacing:.06em;color:var(--accent)}
 .top .ttl{font-weight:600}
 .hero{background:var(--blush);color:var(--fg);border-radius:24px;padding:28px 20px 20px;box-shadow:none}
 .hero::before,.hero::after{display:none}
@@ -591,7 +592,7 @@ function renderTop(v){
     const ttl=v.name==="guide"?(GROUPS.find(g=>g.id===v.id)?.name||""):v.name==="clinic"?(S.clinics[v.id]?.name||""):v.name==="search"?"検索":v.name==="book"?"予約リクエスト":v.name==="mybook"?"予約リクエスト履歴":v.name==="admin"?"予約リクエスト管理":v.name==="report"?"送客レポート":v.name==="myrev"?"自分の口コミ":v.name==="info"?"アプリについて":v.name==="likes"?"お気に入り":v.name==="notice"?"お知らせ":v.name==="recent"?"最近見たクリニック":"";
     tb.innerHTML='<button class="back" data-pop aria-label="戻る">'+IC.back+'</button><span class="ttl">'+esc(ttl)+'</span><span class="spacer"></span>'+(v.name==="clinic"?'<button class="iconbtn heart" data-like="'+esc(v.id)+'" aria-pressed="'+isLiked(v.id)+'" aria-label="お気に入り">'+IC.heart+'</button>':'');
   }else{
-    tb.innerHTML='<button class="logo" data-tab="home"><i>¥</i>キレイネ<small>美容医療の料金比較</small></button><span class="spacer"></span><button class="iconbtn" data-search aria-label="検索">'+IC.search+'</button><button class="iconbtn bell" data-go="notice" aria-label="お知らせ">'+IC.bell+(notices().some(n=>n.at>S.seenAt)?'<i></i>':'')+'</button>';
+    tb.innerHTML='<button class="logo" data-tab="home"><img class="lm" src="/mascot.jpg" srcset="/mascot.jpg 1x, /mascot@2x.jpg 2x" alt="" width="36" height="36"><span class="lt"><b>キレイネ</b><small>公式料金だけで比べる美容医療</small></span></button><span class="spacer"></span><button class="iconbtn" data-search aria-label="検索">'+IC.search+'</button><button class="iconbtn bell" data-go="notice" aria-label="お知らせ">'+IC.bell+(notices().some(n=>n.at>S.seenAt)?'<i></i>':'')+'</button>';
   }
 }
 function renderTabs(){
