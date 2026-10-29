@@ -10,6 +10,8 @@ os.makedirs(OUT, exist_ok=True)
 FPS = 30
 grp, place = TOPIC.split("-", 1)
 page_grp = {"jaw": "botox"}.get(grp, grp)
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__))); import palette
+_pal = palette.get(grp)
 path = f"/tokyo/{page_grp}/" if place == "tokyo" else f"/tokyo/{place}/{page_grp}/"
 if not os.path.exists(os.path.join(REPO, path.strip("/"), "index.html")):
     sys.exit(f"no page {path}")
@@ -23,7 +25,7 @@ threading.Thread(target=srv.serve_forever, daemon=True).start()
 OVER = """
 (()=>{const d=document.createElement('div');d.id='ov';d.style.cssText='position:fixed;left:0;right:0;top:118px;z-index:99;display:flex;justify-content:center;pointer-events:none';
 document.body.appendChild(d);const t=document.createElement('div');t.id='tap';t.style.cssText='position:fixed;z-index:100;width:44px;height:44px;border-radius:50%;background:rgba(59,42,44,.18);border:2px solid rgba(255,255,255,.9);opacity:0;pointer-events:none;transform:translate(-50%,-50%)';document.body.appendChild(t);
-window.__ov=(s)=>{d.innerHTML=s?'<span style="max-width:340px;word-break:keep-all;text-align:center;background:#fff;color:#3B2A2C;font:700 18px/1.5 \\'Noto Sans JP\\',\\'Noto Sans CJK JP\\',sans-serif;padding:8px 14px;border-radius:10px;box-shadow:0 2px 10px rgba(0,0,0,.12);white-space:pre-line">'+s+'</span>':''};
+window.__ov=(s)=>{d.innerHTML=s?'<span style="max-width:340px;word-break:keep-all;text-align:center;background:__BG__;color:#fff;font:700 19px/1.5 \\'Noto Sans JP\\',\\'Noto Sans CJK JP\\',sans-serif;padding:8px 14px;border-radius:10px;box-shadow:0 4px 14px rgba(0,0,0,.25);white-space:pre-line">'+s+'</span>':''};
 window.__tap=(x,y,a)=>{t.style.left=x+'px';t.style.top=y+'px';t.style.opacity=a};})();
 """
 
@@ -35,7 +37,7 @@ with sync_playwright() as pw:
     br = pw.chromium.launch()
     pg = br.new_page(viewport={"width": 360, "height": 640}, device_scale_factor=3, is_mobile=True, has_touch=True)
     pg.goto(f"http://127.0.0.1:{port}{path}"); pg.wait_for_timeout(600); pg.evaluate("document.fonts.ready")
-    pg.evaluate(OVER)
+    pg.evaluate(OVER.replace("__BG__", _pal["bg"]))
     info = pg.evaluate("""()=>{const s=document.querySelector('.stat');const li=document.querySelectorAll('.pl li');
       const v=[...(s?s.querySelectorAll('b'):[])].map(b=>b.innerText.replace(/\\s/g,''));
       return {stat:s?s.getBoundingClientRect().top+scrollY:300, li3:li.length>3?li[3].getBoundingClientRect().top+scrollY:900,
@@ -55,7 +57,7 @@ with sync_playwright() as pw:
         pg.evaluate("t=>window.__ov(t)", text)
         if tap is None: pg.evaluate("window.__tap(0,0,0)")
         if tap and s0 == 3.4:   # 最安の枠をうっすら強調
-            pg.evaluate("()=>{const s=document.querySelector('.stat');if(s){s.style.transition='none';s.style.boxShadow='0 0 0 3px #B0675F'}}")
+            pg.evaluate("()=>{const s=document.querySelector('.stat');if(s){s.style.transition='none';s.style.boxShadow='0 0 0 3px %s'}}" % _pal["bg"])
         frames = int((s1 - s0) * FPS)
         for f in range(frames):
             y = ease(a, b, f / max(1, frames - 1))

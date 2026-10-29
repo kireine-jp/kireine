@@ -53,6 +53,8 @@ G = {
 }
 grp, place = TOPIC.split("-", 1)                       # 例: botox-tokyo / filler-ginza
 T = dict(G[grp])
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__))); import palette
+_pal = palette.get(grp); DARK, ACC, TINT = _pal["bg"], _pal["acc"], _pal["tint"]
 R = rows(T["cat"], T["origins"])
 if place == "tokyo":
     T["place"], T["url"] = "東京", f"https://kirei-ne.com/tokyo/{T['page']}/"
@@ -95,41 +97,41 @@ def brand(color=INK):
     return f'<div class="brand" style="color:{color}">キレイネ</div>'
 
 def hook():
-    return (BASE + f'<div style="position:absolute;inset:0;background:{PAPER}"></div>' + brand() +
-        f'''<div class="s"><p class="k up">{e(T["place"])}の{e(T["name"])}｜{e(T["unit"])}</p>
+    return (BASE + f'<div style="position:absolute;inset:0;background:{DARK}"></div>' + brand(PAPER) +
+        f'''<div class="s" style="color:{PAPER}"><p class="k up" style="color:{ACC}">{e(T["place"])}の{e(T["name"])}｜{e(T["unit"])}</p>
 <p class="up" style="animation-delay:0s;font-size:62px;font-weight:700;margin:26px 0 50px;line-height:1.4">同じ施術なのに…</p>
-<div class="pop serif" style="animation-delay:.1s;font-size:150px;color:{ROSE};line-height:1.1">¥{yen(lo)}</div>
-<div class="fade" style="animation-delay:.3s;font-size:56px;color:{MUTE};margin:18px 0 18px 8px">〜</div>
+<div class="pop serif" style="animation-delay:.1s;font-size:150px;color:{ACC};line-height:1.1">¥{yen(lo)}</div>
+<div class="fade" style="animation-delay:.3s;font-size:56px;opacity:.6;margin:18px 0 18px 8px">〜</div>
 <div class="pop serif" style="animation-delay:.4s;font-size:150px;line-height:1.1">¥{yen(hi)}</div>
-<p class="up" style="animation-delay:.9s;font-size:58px;font-weight:700;margin-top:60px;line-height:1.5">公式料金で<span style="color:{ROSE}">最大{hi/lo:.0f}倍</span>。<br>安い院TOP{N}は👇</p>
-<p class="fade" style="animation-delay:1.1s;font-size:30px;color:{MUTE};margin-top:24px">※製剤・量の違いを含む公式料金の幅</p></div></body></html>''')
+<p class="up" style="animation-delay:.9s;font-size:58px;font-weight:700;margin-top:60px;line-height:1.5">公式料金で<span style="color:{ACC}">最大{hi/lo:.0f}倍</span>。<br>安い院TOP{N}は👇</p>
+<p class="fade" style="animation-delay:1.1s;font-size:30px;opacity:.65;margin-top:24px">※製剤・量の違いを含む公式料金の幅</p></div></body></html>''')
 
 def rank(i, p):
     c = C[p["clinicId"]]
     meta = " ｜ ".join(x for x in [where(c), p.get("product") or "", f'{p["cc"]:g}ccメニュー' if p.get("cc") and T["cat"] == "rejuran" else ""] if x)
     n = N - i
-    bg = ROSE if n == 1 else BLUSH
+    bg = DARK if n == 1 else TINT
     fg = PAPER if n == 1 else INK
     return (BASE + f'<div style="position:absolute;inset:0;background:{bg}"></div>' + brand(fg) +
-        f'''<div class="s" style="color:{fg}"><p class="k fade" style="color:{PAPER if n == 1 else ROSE}">{e(T["place"])}で安い{e(T["name"])}</p>
-<div class="pop serif" style="font-size:220px;line-height:1;margin:30px 0 40px">{n}<span style="font-size:90px">位</span></div>
+        f'''<div class="s" style="color:{fg}"><p class="k fade" style="color:{ACC if n == 1 else DARK}">{e(T["place"])}で安い{e(T["name"])}</p>
+<div class="pop serif" style="font-size:220px;line-height:1;margin:30px 0 40px;color:{ACC if n == 1 else DARK}">{n}<span style="font-size:90px">位</span></div>
 <p class="up" style="animation-delay:.15s;font-size:68px;font-weight:700;line-height:1.35">{e(c["name"])}</p>
 <p class="up" style="animation-delay:.25s;font-size:40px;opacity:.75;margin-top:18px;line-height:1.5">{e(meta)}</p>
 <div class="pop serif" style="animation-delay:.45s;font-size:140px;margin-top:60px;line-height:1">¥{yen(p["_u"])}<span style="font-size:48px"> {e(T["unit"])}</span></div>
 </div></body></html>''')
 
 def souba():
-    return (BASE + f'<div style="position:absolute;inset:0;background:{PAPER}"></div>' + brand() +
-        f'''<div class="s"><p class="k fade">ちなみに{e(T["place"])}の“相場”は</p>
+    return (BASE + f'<div style="position:absolute;inset:0;background:{TINT}"></div>' + brand() +
+        f'''<div class="s"><p class="k fade" style="color:{DARK}">ちなみに{e(T["place"])}の“相場”は</p>
 <div class="pop serif" style="animation-delay:.2s;font-size:170px;margin:40px 0 20px;line-height:1">¥{yen(round(med, -2))}</div>
 <p class="up" style="animation-delay:.4s;font-size:46px;color:{MUTE}">{e(T["unit"])}・掲載{len(R)}院の中央値</p>
-<p class="up" style="animation-delay:.8s;font-size:60px;font-weight:700;margin-top:80px;line-height:1.5">1位なら相場より<br><span style="color:{ROSE}">¥{yen(med - lo)}</span> おトク。</p></div></body></html>''')
+<p class="up" style="animation-delay:.8s;font-size:60px;font-weight:700;margin-top:80px;line-height:1.5">1位なら相場より<br><span style="color:{DARK};background:{ACC};padding:0 14px;border-radius:12px">¥{yen(med - lo)}</span> おトク。</p></div></body></html>''')
 
 def cta():
-    return (BASE + f'<div style="position:absolute;inset:0;background:{ROSE}"></div>' + brand(PAPER) +
+    return (BASE + f'<div style="position:absolute;inset:0;background:{DARK}"></div>' + brand(PAPER) +
         f'''<div class="s" style="color:{PAPER}"><p class="up serif" style="font-size:96px;line-height:1.45">予約する前に、<br>保存しておこう。</p>
 <p class="up" style="animation-delay:.3s;font-size:50px;margin-top:60px;line-height:1.6">全国のクリニックの料金比較は<br>プロフィールのリンクから</p>
-<div class="pop" style="animation-delay:.6s;margin-top:60px;background:{PAPER};color:{INK};border-radius:999px;padding:34px 50px;font-size:54px;font-weight:700;align-self:flex-start">kirei-ne.com</div>
+<div class="pop" style="animation-delay:.6s;margin-top:60px;background:{ACC};color:{DARK};border-radius:999px;padding:34px 50px;font-size:54px;font-weight:700;align-self:flex-start">kirei-ne.com</div>
 <p class="fade" style="animation-delay:.9s;font-size:28px;margin-top:70px;opacity:.8;line-height:1.7">{dlabel}時点・各院公式サイトの税込通常価格。最新情報・リスクは各院にご確認ください。広告費は受け取っていません。</p></div></body></html>''')
 
 def threads_text():
