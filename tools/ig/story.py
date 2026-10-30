@@ -71,10 +71,20 @@ with sync_playwright() as pw:
     pg.set_content(page); pg.wait_for_timeout(300); pg.evaluate("document.fonts.ready")
     pg.screenshot(path=f"{OUT}/story.jpg", type="jpeg", quality=90); b.close()
 
-lines = [f"【今日の最安】東京の{name}({unit})", "",
+# 書き出しと締めの質問は毎日変える(VOICE.md: 同じ書き出しを続けない。1行目で読む人を絞る・街の名前を入れる)
+area1 = where(C[first["clinicId"]]); lo = first["_u"]; ratio = med / lo if lo else 0
+openers = [f"今朝の料金チェック、東京の{name}でいちばん安かったのは¥{yen(lo)}。",
+           f"{name}の予約前の人へ。今日の安い順だけ置いておくね。",
+           f"地味に知りたい人多そうなやつ。東京の{name}、今日の安い順。"]
+if area1 != "都内各院": openers.append(f"{area1}あたりで{name}探してる人、今日はここが一番安かった。")
+if ratio >= 2: openers.append(f"東京の{name}、一番安いところと相場で{ratio:.0f}倍くらい違った。")
+asks = ["どこで受けてる？", "値段と通いやすさ、どっちを優先する？", "みんなはいくらくらいで受けた？",
+        "初めて受けるなら、どこを決め手にする？", "予約するとき、公式の料金表まで見る派？"]
+k = today.toordinal()
+lines = [openers[k % len(openers)], f"({name}・{unit}・東京の公式料金)", "",
          f"1位 {C[first['clinicId']]['name']}({where(C[first['clinicId']])}) ¥{yen(first['_u'])}"]
 lines += [f"{i+2}位 {C[p['clinicId']]['name']} ¥{yen(p['_u'])}" for i, p in enumerate(rest)]
-lines += ["", f"東京の相場は ¥{yen(round(med, -2))}(掲載{len(top)}院の中央値)。", "どこで受けてる？", "", f"比較 → {url}",
+lines += ["", f"東京の相場は ¥{yen(round(med, -2))}(掲載{len(top)}院の中央値)。", asks[k % len(asks)], "", f"比較 → {url}",
           f"※{dlabel}時点・公式サイトの税込通常価格"]
 open(f"{OUT}/threads.txt", "w", encoding="utf-8").write("\n".join(lines)[:490])
 json.dump({"date": today.isoformat(), "theme": cat, "name": name}, open(f"{OUT}/meta.json", "w"), ensure_ascii=False)
