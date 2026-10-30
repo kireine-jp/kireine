@@ -44,9 +44,16 @@ else:
 rec = {}
 if IG_TOKEN and IG_UID:
     try:
-        c = call(IG_API, IG_TOKEN, "POST", f"{IG_UID}/media", media_type="STORIES", image_url=img)["id"]
-        wait(lambda: call(IG_API, IG_TOKEN, "GET", c, fields="status_code").get("status_code"))
-        rec["ig_story"] = call(IG_API, IG_TOKEN, "POST", f"{IG_UID}/media_publish", creation_id=c)["id"]
+        for attempt in range(3):   # media_publish が「Media Not Found」で落ちることがあるので作り直して再試行
+            try:
+                c = call(IG_API, IG_TOKEN, "POST", f"{IG_UID}/media", media_type="STORIES", image_url=img)["id"]
+                wait(lambda: call(IG_API, IG_TOKEN, "GET", c, fields="status_code").get("status_code"))
+                time.sleep(5)
+                rec["ig_story"] = call(IG_API, IG_TOKEN, "POST", f"{IG_UID}/media_publish", creation_id=c)["id"]
+                break
+            except RuntimeError as e:
+                if attempt == 2: raise
+                print("retry instagram:", e, flush=True); time.sleep(30)
         print("instagram story published", rec["ig_story"], flush=True)
     except RuntimeError as e: errors.append(f"Instagram {e}")
 if TH_TOKEN:
@@ -58,6 +65,7 @@ if TH_TOKEN:
         rec["threads"] = call(TH_API, TH_TOKEN, "POST", f"{uid}/threads_publish", creation_id=c)["id"]
         print("threads published", rec["threads"], flush=True)
     except RuntimeError as e: errors.append(f"Threads {e}")
-json.dump(rec | {"posted_at": time.strftime("%Y-%m-%dT%H:%M:%S%z")}, open(os.path.join(d, "posted.json"), "w"))
+if rec:   # 1つも投稿できなかったら記録しない(次回また試す)
+    json.dump(rec | {"posted_at": time.strftime("%Y-%m-%dT%H:%M:%S%z")}, open(os.path.join(d, "posted.json"), "w"))
 for m in errors: print(f"::error::{m}")
 sys.exit(1 if errors else 0)
