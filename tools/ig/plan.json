@@ -1,12 +1,15 @@
 {
- "_note": "投稿の作り方の設定。毎週の成果レポート(ig/report/)を見て調整。screen=実際のサイト画面をスマホで見せるリール(人っぽさ重視)。 リールはオーナーがアプリで音楽を付けて手動投稿(manual_reels)。",
+ "_note": "投稿の作り方の設定。毎週の成果レポート(ig/report/)を見て調整。screen=実際のサイト画面をスマホで見せるリール(人っぽさ重視)。 リールはオーナーがアプリで音楽を付けて手動投稿(manual_reels)。 2026-10-30: オーナーが毎日リールを投稿する方針 → リール5:カルーセル2のパターン、keep=3、未投稿リールが常に1本以上(min_reels=1)。",
  "pattern": [
+  "reel",
+  "screen",
+  "card",
   "reel",
   "screen",
   "reel",
   "card"
  ],
- "keep": 2,
+ "keep": 3,
  "reel": [
   "botox-tokyo",
   "botox-ginza",
@@ -40,5 +43,6 @@
   "filler-ginza",
   "botox-tokyo"
  ],
- "manual_reels": true
+ "manual_reels": true,
+ "min_reels": 1
 }

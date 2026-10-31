@@ -42,13 +42,23 @@ pre{{white-space:pre-wrap;background:#F6EEEC;padding:14px;border-radius:10px;fon
 <h3>{name}（{'リール' if kind in ('reel', 'screen') else 'カルーセル'}）</h3>{media}<pre>{html.escape(cap)}</pre></body></html>""")
 
 today = datetime.date.today().isoformat()
+MIN_REELS = PLAN.get("min_reels", 0)   # 毎日リールを出すため、未投稿リールがこの数より少なければキューが満杯でも作る
+
+def listdirs():
+    return sorted((d for d in os.listdir(base) if d not in ("stories", "threads", "report") and os.path.isdir(os.path.join(base, d))), key=lambda d: (meta(d).get("seq", 0), d))
+
 made = 0
 while True:
-    dirs = sorted((d for d in os.listdir(base) if d not in ("stories", "threads", "report") and os.path.isdir(os.path.join(base, d))), key=lambda d: (meta(d).get("seq", 0), d))
+    dirs = listdirs()
     pend = [d for d in dirs if is_pending(d)]
-    if len(pend) >= KEEP and not (force and made == 0):
+    reels_pend = [d for d in pend if os.path.exists(os.path.join(base, d, "reel.mp4"))]
+    need_reel = len(reels_pend) < MIN_REELS
+    if len(pend) >= KEEP and not need_reel and not (force and made == 0):
         print(f"queue full ({len(pend)} pending): {pend}"); break
     kind = PATTERN[sum(1 for x in dirs if meta(x).get("kind")) % len(PATTERN)]
+    if need_reel and kind not in ("reel", "screen"):   # リールが足りない時はパターン中の次のリール系を使う
+        n = sum(1 for x in dirs if meta(x).get("kind"))
+        kind = next(PATTERN[(n + k) % len(PATTERN)] for k in range(len(PATTERN)) if PATTERN[(n + k) % len(PATTERN)] in ("reel", "screen"))
     last_topic = next((meta(d).get("topic") for d in reversed(dirs) if meta(d).get("kind", "card") == kind), None)
     rot = ROT[kind]
     i0 = (rot.index(last_topic) + 1) % len(rot) if last_topic in rot else 0
@@ -59,6 +69,7 @@ while True:
         name = f"{today}-{kind}-{topic}"
         out = os.path.join(base, name)
         if os.path.exists(out): out = None; continue
+        if any(meta(d).get("topic") == topic for d in pend): out = None; continue   # 未投稿と同じテーマは続けない
         r = subprocess.run([sys.executable, os.path.join(repo, "tools/ig", script), repo, out, topic])
         if r.returncode == 0: break
         print("skip", topic); subprocess.run(["rm", "-rf", out]); out = None
