@@ -63,7 +63,7 @@ def generate(OUT, clinics, prices, updates, groups, css, SITE):
     lastj = last.replace("-", "/")
     urls = []
 
-    def write(path, title, desc, crumbs, body, extra_head=""):
+    def write(path, title, desc, crumbs, body, extra_head="", noindex=False):
         d = os.path.join(OUT, path.strip("/"))
         os.makedirs(d, exist_ok=True)
         url = f"{SITE}/{path.strip('/')}/"
@@ -80,7 +80,7 @@ def generate(OUT, clinics, prices, updates, groups, css, SITE):
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <meta property="og:type" content="article"><meta property="og:site_name" content="キレイネ"><meta property="og:title" content="{esc(title)}"><meta property="og:description" content="{esc(desc)}"><meta property="og:url" content="{url}"><meta property="og:image" content="{SITE}/og.png"><meta name="twitter:card" content="summary_large_image">
 <script type="application/ld+json">{json.dumps(ld, ensure_ascii=False)}</script>
-{extra_head}<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Noto+Serif+JP:wght@500;600&display=swap">
+{'<meta name="robots" content="noindex,follow">' if noindex else ''}{extra_head}<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Noto+Serif+JP:wght@500;600&display=swap">
 <style>{css}</style>
 </head>
 <body>
@@ -95,7 +95,7 @@ def generate(OUT, clinics, prices, updates, groups, css, SITE):
 </html>
 """
         open(os.path.join(d, "index.html"), "w", encoding="utf-8").write(page)
-        urls.append(path.strip("/") + "/")
+        if not noindex: urls.append(path.strip("/") + "/")   # 掲載院が少ないページは検索に出さず、サイトマップからも外す
 
     def row(p, rank=None, compact=False):
         c = C[p["clinicId"]]
@@ -158,6 +158,49 @@ def generate(OUT, clinics, prices, updates, groups, css, SITE):
     def app_cta(text="アプリで製剤・条件を絞り込んで比べる"):
         return f'<a class="cta" href="/">{esc(text)} ›</a>'
 
+    def insights(ps, g, where):
+        """そのページの料金データだけから「比べて分かったこと」を作る(ページごとに中身が変わる)。"""
+        li = []
+        for cat, label in g["subs"]:
+            sp = [p for p in ps if p["cat"] == cat]
+            norm = [p for p in sp if p.get("cond") == "通常"]
+            if len(norm) < 2: continue
+            norm.sort(key=unit_price)
+            lo, hi = norm[0], norm[-1]
+            unit = "1ccあたり" if cat == "rejuran" else label
+            r = unit_price(hi) / unit_price(lo)
+            if r >= 1.3:
+                li.append(f'{esc(where)}の{esc(g["short"])}({esc(unit)})は、通常価格の最安{yen(unit_price(lo))}円と最高{yen(unit_price(hi))}円で約{r:.1f}倍の差があります。')
+            prod = lo.get("product") or ""
+            taxed = [p for p in norm if p.get("tax")]
+            if prod and taxed and taxed[0] is not lo:
+                t = taxed[0]
+                li.append(f'税込表示を確認できた院でいちばん安いのは{esc(C[t["clinicId"]]["name"])}の{esc(t.get("product") or "")}({yen(t["price"])}円)。表示額だけなら{esc(C[lo["clinicId"]]["name"])}の{yen(lo["price"])}円が最安ですが、税込かどうかは公式サイトで確認してください。')
+            elif prod: li.append(f'通常価格でいちばん安いのは{esc(C[lo["clinicId"]]["name"])}の{esc(prod)}({yen(lo["price"])}円)。製剤名・単位数・部位が同じかどうかも合わせて確認してください。')
+            if g["id"] == "botox":
+                med = {}
+                for o, nm in (("korea", "韓国製"), ("allergan", "アラガン")):
+                    v = [unit_price(p) for p in norm if p.get("origin") == o]
+                    if len(v) >= 2: med[nm] = statistics.median(v)
+                if len(med) == 2:
+                    li.append(f'{esc(label)}の中央値は韓国製が{yen(med["韓国製"])}円、アラガンが{yen(med["アラガン"])}円。同じ院でも製剤によって料金が変わることがあります。')
+            first = {p["clinicId"] for p in sp if p.get("cond") == "初回"}
+            if first: li.append(f'{len(first)}院は初回価格を別に掲載しています。2回目以降も通う場合は、通常価格で比べるのがおすすめです。')
+            notax = {p["clinicId"] for p in sp if not p.get("tax")}
+            if notax: li.append(f'{len(notax)}院は公式サイトで税込かどうかをすぐに確認できませんでした(「税表記要確認」)。税抜表記なら支払額は約1.1倍になります。')
+        today = datetime.date.fromisoformat(last)
+        for p in ps:
+            ch = p.get("changed")
+            if isinstance(ch, dict) and ch.get("from") and ch.get("date"):
+                try: dd = datetime.date.fromisoformat(ch["date"])
+                except ValueError: continue
+                if (today - dd).days <= 30:
+                    li.append(f'{esc(ch["date"].replace("-","/"))}の確認で、{esc(C[p["clinicId"]]["name"])}の{esc(SUB.get(p["cat"], ""))}が{yen(ch["from"])}円→{yen(p["price"])}円に変わりました。')
+        if not li: return ""
+        return f'<h2>料金を比べて分かったこと</h2><ul class="ins">{"".join(f"<li>{x}</li>" for x in li[:6])}</ul><p class="note">キレイネが毎日、各院の公式サイトの料金表を確認して記録しているデータから作成しています。</p>'
+
+    MIN_INDEX = 2   # 1院だけの「比較」ページは検索に出さない(2院のページは院を増やして厚くする)
+
     local = {}
     for c in clinics:
         if c.get("scope") != "national" and c.get("pref") in PREF_SLUG:
@@ -203,7 +246,7 @@ def generate(OUT, clinics, prices, updates, groups, css, SITE):
             n = len({p["clinicId"] for p in gp if C[p["clinicId"]].get("pref") == pref})
             if n: prefs.append(f'<a href="/{slug}/{g["id"]}/">{esc(pref)}<small>{n}院</small></a>')
         body = (f'<h1>{esc(g["name"])}の料金相場と最安値【全国{ncl}院】</h1><p class="lead">全国{ncl}院の公式サイトに掲載された{esc(g["name"])}の料金{len(gp)}件をもとに、相場(中央値)と安い順のランキングをまとめました。{lastj}更新。</p>'
-                + gsections(gp, g, limit=15) + f'<h2>都道府県から探す</h2><div class="links grid">{"".join(prefs)}</div>' + app_cta() + facts(g))
+                + insights(gp, g, "全国") + gsections(gp, g, limit=15) + f'<h2>都道府県から探す</h2><div class="links grid">{"".join(prefs)}</div>' + app_cta() + facts(g))
         title = f'{g["name"]}の料金相場・最安値ランキング【全国{ncl}院・{lastj}更新】｜キレイネ'
         st = stats([p for p in gp if p["cat"] == g["subs"][0][0]])
         desc = f'{g["name"]}の料金を全国{ncl}院の公式サイトから比較。' + (f'{g["subs"][0][1]}の中央値は{yen(st[1])}円、最安は{yen(st[0])}円。' if st else "") + "安い順のランキングと都道府県別の料金がわかります。"
@@ -231,7 +274,7 @@ def generate(OUT, clinics, prices, updates, groups, css, SITE):
             body = (f'<h1>{esc(pref)}の{esc(g["name"])}料金比較【{nloc}院・安い順】</h1>'
                     f'<p class="lead">{esc(pref)}で{esc(g["name"])}を受けられるクリニック{nloc}院の料金を、各院の公式サイトの料金表から安い順に並べました。{lastj}更新。</p>'
                     + (f'<h2>エリアで絞り込む</h2><div class="links grid">{"".join(sub_areas)}</div>' if sub_areas else "")
-                    + gsections(lp, g))
+                    + insights(lp, g, pref) + gsections(lp, g))
             if np_:
                 body += (f'<h2>全国チェーンの{esc(g["name"])}料金</h2><p class="note">全国展開のクリニックの共通料金です。{esc(pref)}内に院があるか、院ごとに料金が異なるかは各公式サイトでご確認ください。</p>'
                          + gsections(np_, g, limit=10, show_stats=False))
@@ -240,7 +283,7 @@ def generate(OUT, clinics, prices, updates, groups, css, SITE):
             st = stats([p for p in lp if p["cat"] == g["subs"][0][0]])
             title = f'{pref}の{g["name"]}料金比較・最安値【{nloc}院｜{lastj}更新】｜キレイネ'
             desc = f'{pref}の{g["name"]}の料金を{nloc}院の公式サイトから比較。' + (f'{g["subs"][0][1]}は最安{yen(st[0])}円・中央値{yen(st[1])}円。' if st else "") + "製剤・単位・初回価格の違いもわかります。"
-            write(f'{slug}/{g["id"]}', title, desc, [("トップ", "/"), (pref, f'/{slug}/'), (g["name"], f'/{slug}/{g["id"]}/')], body)
+            write(f'{slug}/{g["id"]}', title, desc, [("トップ", "/"), (pref, f'/{slug}/'), (g["name"], f'/{slug}/{g["id"]}/')], body, noindex=nloc < MIN_INDEX)
             # area x treatment
             for aslug, (kind, label, cids) in areas.items():
                 ap = [p for p in lp if p["clinicId"] in cids]
@@ -249,11 +292,11 @@ def generate(OUT, clinics, prices, updates, groups, css, SITE):
                 where = label if kind == "ward" else f"{label}周辺"
                 body = (f'<h1>{esc(where)}の{esc(g["name"])}料金比較【{n}院・安い順】</h1>'
                         f'<p class="lead">{esc(pref)}{esc(where)}で{esc(g["name"])}を受けられるクリニック{n}院の公式料金を安い順に掲載しています。{lastj}更新。</p>'
-                        + gsections(ap, g) + app_cta() + f'<p><a href="/{slug}/{g["id"]}/">{esc(pref)}全体の{esc(g["name"])}料金を見る ›</a></p>' + facts(g))
+                        + insights(ap, g, where) + gsections(ap, g) + app_cta() + f'<p><a href="/{slug}/{g["id"]}/">{esc(pref)}全体の{esc(g["name"])}料金を見る ›</a></p>' + facts(g))
                 st = stats([p for p in ap if p["cat"] == g["subs"][0][0]])
                 title = f'{label}の{g["name"]}料金比較・最安値【{n}院｜{lastj}更新】｜キレイネ'
                 desc = f'{where}の{g["name"]}の料金を{n}院の公式サイトから比較。' + (f'{g["subs"][0][1]}は最安{yen(st[0])}円。' if st else "") + "安い順にわかります。"
-                write(f'{slug}/{aslug}/{g["id"]}', title, desc, [("トップ", "/"), (pref, f'/{slug}/'), (g["name"], f'/{slug}/{g["id"]}/'), (label, f'/{slug}/{aslug}/{g["id"]}/')], body)
+                write(f'{slug}/{aslug}/{g["id"]}', title, desc, [("トップ", "/"), (pref, f'/{slug}/'), (g["name"], f'/{slug}/{g["id"]}/'), (label, f'/{slug}/{aslug}/{g["id"]}/')], body, noindex=n < MIN_INDEX)
         cl = sorted(ids, key=lambda i: C[i]["name"])
         clinic_links = "".join(f'<a href="/clinic/{esc(i)}/">{esc(C[i]["name"])}<small>{esc(C[i].get("area",""))}</small></a>' for i in cl if any(p["clinicId"] == i for p in P))
         area_links = "".join(f'<a href="/{slug}/{a}/{g["id"]}/">{esc(v[1])}の{esc(g["short"])}</a>' for a, v in sorted(areas.items(), key=lambda x: -len(x[1][2])) for g in groups
