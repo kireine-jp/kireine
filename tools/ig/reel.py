@@ -22,6 +22,9 @@ SERIF, SANS = "'Noto Serif JP','Noto Serif CJK JP',serif", "'Noto Sans JP','Noto
 
 def where(c):
     if c.get("scope") == "national": return "都内各院"
+    if globals().get("lab"):                            # 駅エリアの回は、その駅の院名を優先して表示
+        for part in (c.get("area") or "").replace("(", "・").replace(")", "").split("・"):
+            if part and part in lab: return part
     a = (c.get("area") or "").split("(")
     return (a[1] if len(a) > 1 else a[0]).replace(")", "").replace("）", "").split("・")[0]
 
