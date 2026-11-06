@@ -53,6 +53,41 @@ def unit_price(p):
     if p["cat"] == "rejuran" and p.get("cc"): return p["price"] / p["cc"]
     return p["price"]
 
+def write_page(OUT, SITE, groups, css, path, title, desc, crumbs, body, extra_head="", noindex=False, og_type="article"):
+    d = os.path.join(OUT, path.strip("/"))
+    os.makedirs(d, exist_ok=True)
+    url = f"{SITE}/{path.strip('/')}/"
+    bc = "".join(f'<a href="{esc(u)}">{esc(n)}</a><span>›</span>' for n, u in crumbs[:-1]) + f"<b>{esc(crumbs[-1][0])}</b>"
+    ld = {"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":i+1,"name":n,"item":SITE+u} for i,(n,u) in enumerate(crumbs)]}
+    page = f"""<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{esc(title)}</title>
+<meta name="description" content="{esc(desc)}">
+<link rel="canonical" href="{url}">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<meta property="og:type" content="{og_type}"><meta property="og:site_name" content="キレイネ"><meta property="og:title" content="{esc(title)}"><meta property="og:description" content="{esc(desc)}"><meta property="og:url" content="{url}"><meta property="og:image" content="{SITE}/og.png"><meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">{json.dumps(ld, ensure_ascii=False)}</script>
+{'<meta name="robots" content="noindex,follow">' if noindex else ''}{extra_head}<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Noto+Serif+JP:wght@500;600&display=swap">
+<style>{css}</style>
+</head>
+<body>
+<header><a class="logo" href="/"><i>¥</i>キレイネ<small>美容医療の最安値を比較</small></a><nav class="hn"><a href="/guide/">料金の見方ガイド</a></nav></header>
+<main>
+<nav class="bc" aria-label="パンくず">{bc}</nav>
+{body}
+<p class="disc">掲載料金は各クリニック公式サイトの掲載額(確認日時点)です。初診料・麻酔代などが別途かかる場合があり、最終的な金額・施術内容・リスクは診察でご確認ください。キレイネは特定の医療機関を推奨するものではなく、掲載院から掲載料・紹介料を受け取っていません。並び順は料金データだけで決めています。</p>
+</main>
+<footer><nav class="glinks">{''.join(f'<a href="/{g["id"]}/">{esc(g["name"])}</a>' for g in groups)}</nav><nav><a href="/">トップ</a><a href="/guide/">料金の見方ガイド</a><a href="/guide/method/">編集方針</a><a href="/about.html">運営者情報</a><a href="/terms.html">利用規約</a><a href="/privacy.html">プライバシーポリシー</a><a href="/contact.html">お問い合わせ</a></nav><p>© {datetime.date.today().year} キレイネ</p></footer>
+</body>
+</html>
+"""
+    open(os.path.join(d, "index.html"), "w", encoding="utf-8").write(page)
+    return not noindex   # 掲載院が少ないページは検索に出さず、サイトマップからも外す
+
+
 def generate(OUT, clinics, prices, updates, groups, css, SITE):
     C = {c["id"]: c for c in clinics}
     P = [p for p in prices if p.get("clinicId") in C and isinstance(p.get("price"), (int, float))]
@@ -64,38 +99,7 @@ def generate(OUT, clinics, prices, updates, groups, css, SITE):
     urls = []
 
     def write(path, title, desc, crumbs, body, extra_head="", noindex=False):
-        d = os.path.join(OUT, path.strip("/"))
-        os.makedirs(d, exist_ok=True)
-        url = f"{SITE}/{path.strip('/')}/"
-        bc = "".join(f'<a href="{esc(u)}">{esc(n)}</a><span>›</span>' for n, u in crumbs[:-1]) + f"<b>{esc(crumbs[-1][0])}</b>"
-        ld = {"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":i+1,"name":n,"item":SITE+u} for i,(n,u) in enumerate(crumbs)]}
-        page = f"""<!doctype html>
-<html lang="ja">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>{esc(title)}</title>
-<meta name="description" content="{esc(desc)}">
-<link rel="canonical" href="{url}">
-<link rel="icon" href="/favicon.svg" type="image/svg+xml">
-<meta property="og:type" content="article"><meta property="og:site_name" content="キレイネ"><meta property="og:title" content="{esc(title)}"><meta property="og:description" content="{esc(desc)}"><meta property="og:url" content="{url}"><meta property="og:image" content="{SITE}/og.png"><meta name="twitter:card" content="summary_large_image">
-<script type="application/ld+json">{json.dumps(ld, ensure_ascii=False)}</script>
-{'<meta name="robots" content="noindex,follow">' if noindex else ''}{extra_head}<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Noto+Serif+JP:wght@500;600&display=swap">
-<style>{css}</style>
-</head>
-<body>
-<header><a class="logo" href="/"><i>¥</i>キレイネ<small>美容医療の最安値を比較</small></a></header>
-<main>
-<nav class="bc" aria-label="パンくず">{bc}</nav>
-{body}
-<p class="disc">掲載料金は各クリニック公式サイトの掲載額(確認日時点)です。初診料・麻酔代などが別途かかる場合があり、最終的な金額・施術内容・リスクは診察でご確認ください。キレイネは特定の医療機関を推奨するものではなく、掲載院から広告費を受け取っていません。</p>
-</main>
-<footer><nav class="glinks">{''.join(f'<a href="/{g["id"]}/">{esc(g["name"])}</a>' for g in groups)}</nav><nav><a href="/">トップ</a><a href="/about.html">運営者情報</a><a href="/terms.html">利用規約</a><a href="/privacy.html">プライバシーポリシー</a><a href="/contact.html">お問い合わせ</a></nav><p>© {datetime.date.today().year} キレイネ</p></footer>
-</body>
-</html>
-"""
-        open(os.path.join(d, "index.html"), "w", encoding="utf-8").write(page)
-        if not noindex: urls.append(path.strip("/") + "/")   # 掲載院が少ないページは検索に出さず、サイトマップからも外す
+        if write_page(OUT, SITE, groups, css, path, title, desc, crumbs, body, extra_head, noindex): urls.append(path.strip("/") + "/")
 
     def row(p, rank=None, compact=False):
         c = C[p["clinicId"]]
@@ -199,6 +203,37 @@ def generate(OUT, clinics, prices, updates, groups, css, SITE):
         if not li: return ""
         return f'<h2>料金を比べて分かったこと</h2><ul class="ins">{"".join(f"<li>{x}</li>" for x in li[:6])}</ul><p class="note">キレイネが毎日、各院の公式サイトの料金表を確認して記録しているデータから作成しています。</p>'
 
+    def cmins(cat, scope_pref):
+        """{clinicId: その院の通常価格の最安(単価)} を、同じ都道府県の単独院(scope_pref=None なら全院)で集める。"""
+        d = {}
+        for p in P:
+            if p["cat"] != cat or p.get("cond") != "通常": continue
+            c2 = C[p["clinicId"]]
+            if scope_pref and not (c2.get("pref") == scope_pref and c2.get("scope") != "national"): continue
+            u = unit_price(p)
+            if p["clinicId"] not in d or u < d[p["clinicId"]]: d[p["clinicId"]] = u
+        return d
+
+    def market(c, ps):
+        """院ページ用:この院の通常価格が、同じ地域の掲載院の中でどのくらいの水準かを書く。"""
+        where = c.get("pref") if c.get("scope") != "national" and c.get("pref") else None
+        label = where or "全国"
+        li = []
+        for g in groups:
+            for cat, sub in g["subs"]:
+                if not any(p["cat"] == cat and p.get("cond") == "通常" for p in ps): continue
+                d = cmins(cat, where)
+                if c["id"] not in d or len(d) < 3: continue
+                v = sorted(d.values()); mine = d[c["id"]]; m = statistics.median(v)
+                rank = 1 + sum(1 for x in v if x < mine)
+                unit = "(1ccあたり)" if cat == "rejuran" else ""
+                diff = mine - m
+                lvl = "とほぼ同じ" if abs(diff) < m * 0.05 else (f"より{yen(-diff)}円安い" if diff < 0 else f"より{yen(diff)}円高い")
+                li.append(f'<li><b>{esc(g["short"])} {esc(sub)}</b>:この院の通常価格{yen(mine)}円{esc(unit)}は、{esc(label)}の掲載{len(v)}院の中央値{yen(m)}円{lvl}水準です({len(v)}院中{rank}番目に安い)。</li>')
+        if not li: return ""
+        return (f'<h2>{esc(label)}の相場と比べると</h2><ul class="ins">{"".join(li)}</ul>'
+                f'<p class="note">各院の通常価格のうちいちばん安い料金どうしで比べています。製剤・単位数・部位が同じとは限らないため、目安としてご覧ください。<a href="/guide/price-check/">料金表の見方</a></p>')
+
     MIN_INDEX = 2   # 1院だけの「比較」ページは検索に出さない(2院のページは院を増やして厚くする)
 
     local = {}
@@ -206,6 +241,19 @@ def generate(OUT, clinics, prices, updates, groups, css, SITE):
         if c.get("scope") != "national" and c.get("pref") in PREF_SLUG:
             local.setdefault(c["pref"], []).append(c["id"])
     national = {c["id"] for c in clinics if c.get("scope") == "national"}
+
+    def pref_table(pref, ids):
+        trs = ""
+        for g in groups:
+            for cat, sub in g["subs"]:
+                v = [unit_price(p) for p in P if p["clinicId"] in ids and p["cat"] == cat and p.get("cond") == "通常"]
+                n = len({p["clinicId"] for p in P if p["clinicId"] in ids and p["cat"] == cat and p.get("cond") == "通常"})
+                if not v: continue
+                unit = ""
+                trs += f'<tr><td>{esc(g["short"])} {esc(sub)}{unit}</td><td>{n}院</td><td>{yen(min(v))}円</td><td>{yen(statistics.median(v))}円</td></tr>'
+        if not trs: return ""
+        return (f'<h2>{esc(pref)}の料金の目安</h2><div class="tw"><table class="gt"><thead><tr><th>施術</th><th>掲載院</th><th>最安</th><th>中央値</th></tr></thead><tbody>{trs}</tbody></table></div>'
+                f'<p class="note">{esc(pref)}の単独院(全国チェーンを除く)の通常価格から計算。{lastj}時点。比べ方は<a href="/guide/">料金の見方ガイド</a>をご覧ください。</p>')
 
     # ---- clinic pages ----
     for c in clinics:
@@ -223,6 +271,7 @@ def generate(OUT, clinics, prices, updates, groups, css, SITE):
             for cat, label in g["subs"]:
                 sp = sorted([p for p in gp if p["cat"] == cat], key=lambda p: (COND_ORDER.get(p.get("cond"), 9), p["price"]))
                 if sp: body += f'<h3>{esc(label)}</h3><ol class="pl np">' + "".join(row(p, compact=True) for p in sp) + "</ol>"
+        body += market(c, ps)
         rel = []
         if c.get("pref") in PREF_SLUG:
             ps_ = PREF_SLUG[c["pref"]]
@@ -302,7 +351,8 @@ def generate(OUT, clinics, prices, updates, groups, css, SITE):
         area_links = "".join(f'<a href="/{slug}/{a}/{g["id"]}/">{esc(v[1])}の{esc(g["short"])}</a>' for a, v in sorted(areas.items(), key=lambda x: -len(x[1][2])) for g in groups
                              if len({p["clinicId"] for p in P if p["clinicId"] in v[2] and CAT2G.get(p["cat"]) is g}) >= 2)
         body = (f'<h1>{esc(pref)}の美容皮膚科 料金比較【{len(ids)}院】</h1><p class="lead">{esc(pref)}の美容皮膚科・美容クリニック{len(ids)}院の料金を、公式サイトの料金表から施術別に比較できます。{lastj}更新。</p>'
-                f'<h2>施術から探す</h2><div class="links grid">{"".join(gl)}</div>'
+                + pref_table(pref, ids)
+                + f'<h2>施術から探す</h2><div class="links grid">{"".join(gl)}</div>'
                 + (f'<h2>エリア×施術から探す</h2><div class="links grid">{area_links}</div>' if area_links else "")
                 + f'<h2>{esc(pref)}のクリニック一覧</h2><div class="links grid">{clinic_links}</div>' + app_cta())
         write(slug, f'{pref}の美容皮膚科 料金比較【{len(ids)}院｜{lastj}更新】｜キレイネ', f'{pref}の美容皮膚科{len(ids)}院のボトックス・ヒアルロン酸・リジュラン・シミ治療・医療脱毛の料金を公式サイトから比較。', [("トップ", "/"), (pref, f"/{slug}/")], body)
@@ -317,4 +367,4 @@ def home_links(clinics, prices, groups):
         if c.get("scope") != "national" and c.get("pref") in PREF_SLUG: loc[c["pref"]] = loc.get(c["pref"], 0) + 1
     g = "".join(f'<a href="/{x["id"]}/">{html.escape(x["name"])}の料金相場</a>' for x in groups)
     p = "".join(f'<a href="/{PREF_SLUG[k]}/">{html.escape(k)}</a>' for k, _ in PREFS if k in loc)
-    return f'<footer class="kn-seo"><b>施術から探す</b><nav>{g}</nav><b>都道府県から探す</b><nav>{p}</nav><nav class="kn-legal"><a href="/about.html">運営者情報</a><a href="/terms.html">利用規約</a><a href="/privacy.html">プライバシーポリシー</a><a href="/contact.html">お問い合わせ</a></nav></footer>'
+    return f'<footer class="kn-seo"><b>施術から探す</b><nav>{g}</nav><b>都道府県から探す</b><nav>{p}</nav><nav class="kn-legal"><a href="/guide/">料金の見方ガイド</a><a href="/guide/method/">編集方針</a><a href="/about.html">運営者情報</a><a href="/terms.html">利用規約</a><a href="/privacy.html">プライバシーポリシー</a><a href="/contact.html">お問い合わせ</a></nav></footer>'

@@ -14,7 +14,8 @@
 @media (prefers-color-scheme:dark){:root{--fg:#F3E9E7;--muted:#BBAAA8;--line:#3A2F30;--bg:#1A1516;--surface:#231C1D;--accent:#E3A59C;--blush:#2C2324}}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.8 "Noto Sans JP","Hiragino Sans","Hiragino Kaku Gothic ProN",Meiryo,system-ui,sans-serif}
-header{position:sticky;top:0;background:var(--surface);border-bottom:1px solid var(--line);padding:12px 16px}
+header{position:sticky;top:0;background:var(--surface);border-bottom:1px solid var(--line);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:8px 12px;flex-wrap:wrap}
+.hn a{font-size:13px;font-weight:700;color:var(--fg);text-decoration:none;border:1px solid var(--line);border-radius:999px;padding:6px 12px;white-space:nowrap}
 .logo{display:inline-flex;align-items:baseline;gap:10px;font-family:var(--serif);font-weight:500;font-size:19px;letter-spacing:.14em;color:var(--fg);text-decoration:none}
 .logo i{display:none}
 .logo small{font-family:"Noto Sans JP",sans-serif;letter-spacing:0;font-size:11px;font-weight:500;color:var(--muted)}
@@ -32,6 +33,7 @@ dd{margin:0;overflow-wrap:anywhere}
 footer{border-top:1px solid var(--line);padding:20px 16px 32px;text-align:center;font-size:13px;color:var(--muted)}
 footer nav{display:flex;flex-wrap:wrap;justify-content:center;gap:6px 16px;margin-bottom:8px}
 footer a{color:var(--muted)}
+@media (max-width:480px){.logo small{display:none}}
 
 .bc{font-size:12px;color:var(--muted);display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px}
 .bc a{color:var(--muted)}
@@ -68,15 +70,24 @@ h3{font-size:15px;margin:18px 0 6px}
 .disc{font-size:11.5px;color:var(--muted);margin-top:28px;line-height:1.7}
 footer .glinks{margin-bottom:10px}
 .ins{padding-left:1.2em;font-size:14px;line-height:1.8}.ins li{margin:4px 0}
+.tw{overflow-x:auto;margin:8px 0 12px}
+.gt{width:100%;border-collapse:collapse;font-size:13.5px;background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.gt th,.gt td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+.gt th{background:var(--blush);font-weight:700;font-size:12.5px;white-space:nowrap}
+.gt tr:last-child td{border-bottom:0}
+.gcs{display:grid;gap:10px;margin:14px 0}
+.gc{display:grid;gap:4px;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px 16px;text-decoration:none;color:var(--fg)}
+.gc b{font-family:var(--serif);font-weight:600;font-size:16px}
+.gc span{font-size:13px;color:var(--muted);line-height:1.7}
 </style>
 </head>
 <body>
-<header><a class="logo" href="/"><i>¥</i>キレイネ<small>美容医療の最安値を比較</small></a></header>
+<header><a class="logo" href="/"><i>¥</i>キレイネ<small>美容医療の最安値を比較</small></a><nav class="hn"><a href="/guide/">料金の見方ガイド</a></nav></header>
 <main>
 <nav class="bc" aria-label="パンくず"><a href="/">トップ</a><span>›</span><a href="/kanagawa/">神奈川県</a><span>›</span><b>あらおクリニック</b></nav>
 <h1>あらおクリニックの料金一覧</h1><p class="lead">あらおクリニックのボトックスの料金を、公式サイトの料金表から掲載しています(2026/11/06更新)。</p><div class="card"><dl><dt>所在地</dt><dd>神奈川県 横浜市青葉区</dd><dt>アクセス</dt><dd>青葉台駅 徒歩3分</dd><dt>公式サイト</dt><dd><a href="https://www.araoclinic.net/" rel="nofollow noopener" target="_blank">www.araoclinic.net</a></dd><dt>情報確認日</dt><dd>2026/10/26</dd></dl></div><h2>ボトックス</h2><h3>シワ 1部位(額など)</h3><ol class="pl np"><li><div class="b"><span class="cn">ボトックス</span><span class="m">メーカー記載なし · 1部位・アラガン製は+11,000円</span><span class="tg"><em class="t w">税表記要確認</em><a class="src" href="https://www.araoclinic.net/price/" rel="nofollow noopener" target="_blank">公式の料金表 (2026/10/29確認)</a></span></div><div class="p">22,000<small>円</small></div></li></ol><h3>エラ(両側)</h3><ol class="pl np"><li><div class="b"><span class="cn">エラボトックス</span><span class="m">メーカー記載なし · 50単位</span><span class="tg"><em class="t w">税表記要確認</em><a class="src" href="https://www.araoclinic.net/price/" rel="nofollow noopener" target="_blank">公式の料金表 (2026/10/29確認)</a></span></div><div class="p">44,000<small>円</small></div></li><li><div class="b"><span class="cn">エラボトックス</span><span class="m">メーカー記載なし · 80単位</span><span class="tg"><em class="t w">税表記要確認</em><a class="src" href="https://www.araoclinic.net/price/" rel="nofollow noopener" target="_blank">公式の料金表 (2026/10/29確認)</a></span></div><div class="p">60,500<small>円</small></div></li></ol><a class="cta" href="https://www.araoclinic.net/" rel="nofollow noopener" target="_blank">公式サイトで予約・問い合わせ ›</a><h2>近くのクリニックと比べる</h2><div class="links"><a href="/kanagawa/botox/">神奈川県のボトックス料金比較</a></div>
-<p class="disc">掲載料金は各クリニック公式サイトの掲載額(確認日時点)です。初診料・麻酔代などが別途かかる場合があり、最終的な金額・施術内容・リスクは診察でご確認ください。キレイネは特定の医療機関を推奨するものではなく、掲載院から広告費を受け取っていません。</p>
+<p class="disc">掲載料金は各クリニック公式サイトの掲載額(確認日時点)です。初診料・麻酔代などが別途かかる場合があり、最終的な金額・施術内容・リスクは診察でご確認ください。キレイネは特定の医療機関を推奨するものではなく、掲載院から掲載料・紹介料を受け取っていません。並び順は料金データだけで決めています。</p>
 </main>
-<footer><nav class="glinks"><a href="/hair/">医療脱毛</a><a href="/botox/">ボトックス</a><a href="/filler/">ヒアルロン酸</a><a href="/spot/">シミ・くすみ(IPL)</a><a href="/booster/">リジュラン・肌育</a></nav><nav><a href="/">トップ</a><a href="/about.html">運営者情報</a><a href="/terms.html">利用規約</a><a href="/privacy.html">プライバシーポリシー</a><a href="/contact.html">お問い合わせ</a></nav><p>© 2026 キレイネ</p></footer>
+<footer><nav class="glinks"><a href="/hair/">医療脱毛</a><a href="/botox/">ボトックス</a><a href="/filler/">ヒアルロン酸</a><a href="/spot/">シミ・くすみ(IPL)</a><a href="/booster/">リジュラン・肌育</a></nav><nav><a href="/">トップ</a><a href="/guide/">料金の見方ガイド</a><a href="/guide/method/">編集方針</a><a href="/about.html">運営者情報</a><a href="/terms.html">利用規約</a><a href="/privacy.html">プライバシーポリシー</a><a href="/contact.html">お問い合わせ</a></nav><p>© 2026 キレイネ</p></footer>
 </body>
 </html>

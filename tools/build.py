@@ -4,7 +4,7 @@ live_data_dir holds clinics/*.json, prices/*.json, updates/*.json pulled from th
 """
 import json, glob, os, sys, re, datetime, subprocess, shutil
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-import seo
+import seo, guides
 
 LIVE, OUT = sys.argv[1], sys.argv[2]
 APP = None  # set below
@@ -78,12 +78,12 @@ def page(slug, title, body):
 <style>{css}</style>
 </head>
 <body>
-<header><a class="logo" href="/"><i>¥</i>キレイネ<small>美容医療の最安値を比較</small></a></header>
+<header><a class="logo" href="/"><i>¥</i>キレイネ<small>美容医療の最安値を比較</small></a><nav class="hn"><a href="/guide/">料金の見方ガイド</a></nav></header>
 <main>
 <h1>{title}</h1>
 {body}
 </main>
-<footer><nav><a href="/">トップ</a><a href="/about.html">運営者情報</a><a href="/terms.html">利用規約</a><a href="/privacy.html">プライバシーポリシー</a><a href="/contact.html">お問い合わせ</a></nav><p>© {datetime.date.today().year} キレイネ</p></footer>
+<footer><nav><a href="/">トップ</a><a href="/guide/">料金の見方ガイド</a><a href="/guide/method/">編集方針</a><a href="/about.html">運営者情報</a><a href="/terms.html">利用規約</a><a href="/privacy.html">プライバシーポリシー</a><a href="/contact.html">お問い合わせ</a></nav><p>© {datetime.date.today().year} キレイネ</p></footer>
 </body>
 </html>
 """
@@ -99,7 +99,12 @@ for slug, title in (("about", "運営者情報"), ("terms", "利用規約"), ("p
 # ---- SEO pages ----
 for d in ["clinic"] + [g["id"] for g in GROUPS] + [s for _, s in seo.PREFS]:
     if os.path.isdir(f"{OUT}/{d}"): shutil.rmtree(f"{OUT}/{d}")
-seo_urls = seo.generate(OUT, clinics, prices, updates, GROUPS, css + open(f"{HERE}/seo.css", encoding="utf-8").read(), SITE)
+seo_css_full = css + open(f"{HERE}/seo.css", encoding="utf-8").read()
+seo_urls = seo.generate(OUT, clinics, prices, updates, GROUPS, seo_css_full, SITE)
+# ---- 料金の見方ガイド(/guide/) ----
+if os.path.isdir(f"{OUT}/guide"): shutil.rmtree(f"{OUT}/guide")
+seo_urls += guides.generate(clinics, prices, updates, GROUPS,
+    lambda path, title, desc, crumbs, body, og_type="article": seo.write_page(OUT, SITE, GROUPS, seo_css_full, path, title, desc, crumbs, body, og_type=og_type))
 
 # ---- static extras ----
 today = datetime.date.today().isoformat()

@@ -14,7 +14,8 @@
 @media (prefers-color-scheme:dark){:root{--fg:#F3E9E7;--muted:#BBAAA8;--line:#3A2F30;--bg:#1A1516;--surface:#231C1D;--accent:#E3A59C;--blush:#2C2324}}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.8 "Noto Sans JP","Hiragino Sans","Hiragino Kaku Gothic ProN",Meiryo,system-ui,sans-serif}
-header{position:sticky;top:0;background:var(--surface);border-bottom:1px solid var(--line);padding:12px 16px}
+header{position:sticky;top:0;background:var(--surface);border-bottom:1px solid var(--line);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:8px 12px;flex-wrap:wrap}
+.hn a{font-size:13px;font-weight:700;color:var(--fg);text-decoration:none;border:1px solid var(--line);border-radius:999px;padding:6px 12px;white-space:nowrap}
 .logo{display:inline-flex;align-items:baseline;gap:10px;font-family:var(--serif);font-weight:500;font-size:19px;letter-spacing:.14em;color:var(--fg);text-decoration:none}
 .logo i{display:none}
 .logo small{font-family:"Noto Sans JP",sans-serif;letter-spacing:0;font-size:11px;font-weight:500;color:var(--muted)}
@@ -32,6 +33,7 @@ dd{margin:0;overflow-wrap:anywhere}
 footer{border-top:1px solid var(--line);padding:20px 16px 32px;text-align:center;font-size:13px;color:var(--muted)}
 footer nav{display:flex;flex-wrap:wrap;justify-content:center;gap:6px 16px;margin-bottom:8px}
 footer a{color:var(--muted)}
+@media (max-width:480px){.logo small{display:none}}
 
 .bc{font-size:12px;color:var(--muted);display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px}
 .bc a{color:var(--muted)}
@@ -68,15 +70,24 @@ h3{font-size:15px;margin:18px 0 6px}
 .disc{font-size:11.5px;color:var(--muted);margin-top:28px;line-height:1.7}
 footer .glinks{margin-bottom:10px}
 .ins{padding-left:1.2em;font-size:14px;line-height:1.8}.ins li{margin:4px 0}
+.tw{overflow-x:auto;margin:8px 0 12px}
+.gt{width:100%;border-collapse:collapse;font-size:13.5px;background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.gt th,.gt td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+.gt th{background:var(--blush);font-weight:700;font-size:12.5px;white-space:nowrap}
+.gt tr:last-child td{border-bottom:0}
+.gcs{display:grid;gap:10px;margin:14px 0}
+.gc{display:grid;gap:4px;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px 16px;text-decoration:none;color:var(--fg)}
+.gc b{font-family:var(--serif);font-weight:600;font-size:16px}
+.gc span{font-size:13px;color:var(--muted);line-height:1.7}
 </style>
 </head>
 <body>
-<header><a class="logo" href="/"><i>¥</i>キレイネ<small>美容医療の最安値を比較</small></a></header>
+<header><a class="logo" href="/"><i>¥</i>キレイネ<small>美容医療の最安値を比較</small></a><nav class="hn"><a href="/guide/">料金の見方ガイド</a></nav></header>
 <main>
 <nav class="bc" aria-label="パンくず"><a href="/">トップ</a><span>›</span><a href="/tokyo/">東京都</a><span>›</span><a href="/tokyo/filler/">ヒアルロン酸</a><span>›</span><b>表参道・青山</b></nav>
 <h1>表参道・青山周辺のヒアルロン酸料金比較【4院・安い順】</h1><p class="lead">東京都表参道・青山周辺でヒアルロン酸を受けられるクリニック4院の公式料金を安い順に掲載しています。2026/11/06更新。</p><h2>料金を比べて分かったこと</h2><ul class="ins"><li>表参道・青山周辺のヒアルロン酸(1cc)は、通常価格の最安49,500円と最高88,000円で約1.8倍の差があります。</li><li>通常価格でいちばん安いのは表参道美容外科クリニックのスタイレージ S(49,500円)。製剤名・単位数・部位が同じかどうかも合わせて確認してください。</li><li>1院は公式サイトで税込かどうかをすぐに確認できませんでした(「税表記要確認」)。税抜表記なら支払額は約1.1倍になります。</li></ul><p class="note">キレイネが毎日、各院の公式サイトの料金表を確認して記録しているデータから作成しています。</p><h2 id="filler">ヒアルロン酸 1ccの料金</h2><div class="stat"><div><b>49,500<small>円</small></b><span>最安(通常価格)</span></div><div><b>88,000<small>円</small></b><span>中央値</span></div><div><b>88,000<small>円</small></b><span>最高</span></div></div><ol class="pl"><li><b class="rk">1</b><div class="b"><a class="cn" href="/clinic/omobc/">表参道美容外科クリニック</a><span class="m">東京都 港区(表参道)</span><span class="m">スタイレージ S</span><span class="tg"><em class="t">税込</em><a class="src" href="https://omobc.com/price/" rel="nofollow noopener" target="_blank">公式の料金表 (2026/11/06確認)</a></span></div><div class="p">49,500<small>円</small></div></li><li><b class="rk">2</b><div class="b"><a class="cn" href="/clinic/bj/">表参道BJクリニック</a><span class="m">東京都 港区(表参道)</span><span class="m">ジュビダームビスタ バイクロス</span><span class="tg"><em class="t">税込</em><a class="src" href="https://bj-clinic.jp/price/" rel="nofollow noopener" target="_blank">公式の料金表 (2026/11/04確認)</a></span></div><div class="p">69,800<small>円</small></div></li><li><b class="rk">3</b><div class="b"><a class="cn" href="/clinic/agclinic/">青山外苑前クリニック</a><span class="m">東京都 港区(表参道・青山)</span><span class="m">ジュビダームビスタ ボリューマXC</span><span class="tg"><em class="t">税込</em><a class="src" href="https://ag-clinic.jp/price-surgery.html" rel="nofollow noopener" target="_blank">公式の料金表 (2026/11/03確認)</a></span></div><div class="p">88,000<small>円</small></div></li><li><b class="rk">4</b><div class="b"><a class="cn" href="/clinic/kaunis/">KAUNIS CLINIC</a><span class="m">東京都 港区(表参道)</span><span class="m">ボルベラ/ボリューマ/ボリフト XC</span><span class="tg"><em class="t w">税表記要確認</em><a class="src" href="https://kaunis-clinic.com/price/" rel="nofollow noopener" target="_blank">公式の料金表 (2026/11/03確認)</a></span></div><div class="p">88,000<small>円</small></div></li></ol><a class="cta" href="/">アプリで製剤・条件を絞り込んで比べる ›</a><p><a href="/tokyo/filler/">東京都全体のヒアルロン酸料金を見る ›</a></p><h2>ヒアルロン酸の基本</h2><p>ヒアルロン酸を注入して、ほうれい線・涙袋・唇・鼻などのボリュームを整える施術。</p><div class="card"><dl><dt>持続期間</dt><dd>6ヶ月〜2年(製剤・部位による)</dd><dt>ダウンタイム</dt><dd>腫れ・内出血 数日〜1週間</dd><dt>施術時間</dt><dd>10〜30分ほど</dd><dt>溶解</dt><dd>ヒアルロニダーゼで溶かせる</dd></dl></div><h3>主なリスク・副作用</h3><ul><li>腫れ・内出血・しこり</li><li>感染</li><li>血管塞栓(まれだが重い)</li></ul><p class="note">一般的な目安です。効果や経過には個人差があります。</p>
-<p class="disc">掲載料金は各クリニック公式サイトの掲載額(確認日時点)です。初診料・麻酔代などが別途かかる場合があり、最終的な金額・施術内容・リスクは診察でご確認ください。キレイネは特定の医療機関を推奨するものではなく、掲載院から広告費を受け取っていません。</p>
+<p class="disc">掲載料金は各クリニック公式サイトの掲載額(確認日時点)です。初診料・麻酔代などが別途かかる場合があり、最終的な金額・施術内容・リスクは診察でご確認ください。キレイネは特定の医療機関を推奨するものではなく、掲載院から掲載料・紹介料を受け取っていません。並び順は料金データだけで決めています。</p>
 </main>
-<footer><nav class="glinks"><a href="/hair/">医療脱毛</a><a href="/botox/">ボトックス</a><a href="/filler/">ヒアルロン酸</a><a href="/spot/">シミ・くすみ(IPL)</a><a href="/booster/">リジュラン・肌育</a></nav><nav><a href="/">トップ</a><a href="/about.html">運営者情報</a><a href="/terms.html">利用規約</a><a href="/privacy.html">プライバシーポリシー</a><a href="/contact.html">お問い合わせ</a></nav><p>© 2026 キレイネ</p></footer>
+<footer><nav class="glinks"><a href="/hair/">医療脱毛</a><a href="/botox/">ボトックス</a><a href="/filler/">ヒアルロン酸</a><a href="/spot/">シミ・くすみ(IPL)</a><a href="/booster/">リジュラン・肌育</a></nav><nav><a href="/">トップ</a><a href="/guide/">料金の見方ガイド</a><a href="/guide/method/">編集方針</a><a href="/about.html">運営者情報</a><a href="/terms.html">利用規約</a><a href="/privacy.html">プライバシーポリシー</a><a href="/contact.html">お問い合わせ</a></nav><p>© 2026 キレイネ</p></footer>
 </body>
 </html>

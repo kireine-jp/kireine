@@ -11,7 +11,8 @@
 @media (prefers-color-scheme:dark){:root{--fg:#F3E9E7;--muted:#BBAAA8;--line:#3A2F30;--bg:#1A1516;--surface:#231C1D;--accent:#E3A59C;--blush:#2C2324}}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.8 "Noto Sans JP","Hiragino Sans","Hiragino Kaku Gothic ProN",Meiryo,system-ui,sans-serif}
-header{position:sticky;top:0;background:var(--surface);border-bottom:1px solid var(--line);padding:12px 16px}
+header{position:sticky;top:0;background:var(--surface);border-bottom:1px solid var(--line);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:8px 12px;flex-wrap:wrap}
+.hn a{font-size:13px;font-weight:700;color:var(--fg);text-decoration:none;border:1px solid var(--line);border-radius:999px;padding:6px 12px;white-space:nowrap}
 .logo{display:inline-flex;align-items:baseline;gap:10px;font-family:var(--serif);font-weight:500;font-size:19px;letter-spacing:.14em;color:var(--fg);text-decoration:none}
 .logo i{display:none}
 .logo small{font-family:"Noto Sans JP",sans-serif;letter-spacing:0;font-size:11px;font-weight:500;color:var(--muted)}
@@ -29,10 +30,11 @@ dd{margin:0;overflow-wrap:anywhere}
 footer{border-top:1px solid var(--line);padding:20px 16px 32px;text-align:center;font-size:13px;color:var(--muted)}
 footer nav{display:flex;flex-wrap:wrap;justify-content:center;gap:6px 16px;margin-bottom:8px}
 footer a{color:var(--muted)}
+@media (max-width:480px){.logo small{display:none}}
 </style>
 </head>
 <body>
-<header><a class="logo" href="/"><i>¥</i>キレイネ<small>美容医療の最安値を比較</small></a></header>
+<header><a class="logo" href="/"><i>¥</i>キレイネ<small>美容医療の最安値を比較</small></a><nav class="hn"><a href="/guide/">料金の見方ガイド</a></nav></header>
 <main>
 <h1>運営者情報</h1>
 <div class="card"><dl>
@@ -55,15 +57,18 @@ footer a{color:var(--muted)}
 <ul>
 <li>料金は、各クリニックの<strong>公式サイトに掲載された金額のみ</strong>を使用しています。他の予約サイト・口コミサイトの情報は使用していません。</li>
 <li>料金は毎日確認し、変更があれば更新します。各料金には確認日と出典(公式サイトの料金ページ)を表示しています。</li>
-<li>並び順は料金のみで決めています。当サイトは現在、クリニックから掲載料・広告費を受け取っていません。</li>
+<li>並び順は料金のみで決めています。クリニックから掲載料・紹介料は受け取っていません。</li>
+<li>サイトの運営費のため、第三者配信の広告(Google アドセンス等)を表示する場合があります。広告の有無が掲載内容や並び順に影響することはありません。</li>
 <li>初回価格・モニター価格・キャンペーン価格は、通常価格と区別して表示しています。</li>
 <li>当サイトは予約の取り次ぎを行っていません。ご予約・ご相談は各クリニックへ直接お申し込みください。</li>
 </ul>
+
+<p>料金の集め方・比べ方の詳しいルールは<a href="/guide/method/">編集方針</a>に、料金表を比べるときのポイントは<a href="/guide/">料金の見方ガイド</a>にまとめています。</p>
 
 <h2>ご利用にあたって</h2>
 <p class="note">表示している料金は情報確認時点のものです。最新の料金、施術内容、効果、副作用・リスク、適応については、必ず各クリニックにご確認のうえ、医師の診察を受けてご判断ください。当サイトは特定の医療機関や施術を推奨するものではありません。</p>
 
 </main>
-<footer><nav><a href="/">トップ</a><a href="/about.html">運営者情報</a><a href="/terms.html">利用規約</a><a href="/privacy.html">プライバシーポリシー</a><a href="/contact.html">お問い合わせ</a></nav><p>© 2026 キレイネ</p></footer>
+<footer><nav><a href="/">トップ</a><a href="/guide/">料金の見方ガイド</a><a href="/guide/method/">編集方針</a><a href="/about.html">運営者情報</a><a href="/terms.html">利用規約</a><a href="/privacy.html">プライバシーポリシー</a><a href="/contact.html">お問い合わせ</a></nav><p>© 2026 キレイネ</p></footer>
 </body>
 </html>

@@ -14,7 +14,8 @@
 @media (prefers-color-scheme:dark){:root{--fg:#F3E9E7;--muted:#BBAAA8;--line:#3A2F30;--bg:#1A1516;--surface:#231C1D;--accent:#E3A59C;--blush:#2C2324}}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.8 "Noto Sans JP","Hiragino Sans","Hiragino Kaku Gothic ProN",Meiryo,system-ui,sans-serif}
-header{position:sticky;top:0;background:var(--surface);border-bottom:1px solid var(--line);padding:12px 16px}
+header{position:sticky;top:0;background:var(--surface);border-bottom:1px solid var(--line);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:8px 12px;flex-wrap:wrap}
+.hn a{font-size:13px;font-weight:700;color:var(--fg);text-decoration:none;border:1px solid var(--line);border-radius:999px;padding:6px 12px;white-space:nowrap}
 .logo{display:inline-flex;align-items:baseline;gap:10px;font-family:var(--serif);font-weight:500;font-size:19px;letter-spacing:.14em;color:var(--fg);text-decoration:none}
 .logo i{display:none}
 .logo small{font-family:"Noto Sans JP",sans-serif;letter-spacing:0;font-size:11px;font-weight:500;color:var(--muted)}
@@ -32,6 +33,7 @@ dd{margin:0;overflow-wrap:anywhere}
 footer{border-top:1px solid var(--line);padding:20px 16px 32px;text-align:center;font-size:13px;color:var(--muted)}
 footer nav{display:flex;flex-wrap:wrap;justify-content:center;gap:6px 16px;margin-bottom:8px}
 footer a{color:var(--muted)}
+@media (max-width:480px){.logo small{display:none}}
 
 .bc{font-size:12px;color:var(--muted);display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px}
 .bc a{color:var(--muted)}
@@ -68,15 +70,24 @@ h3{font-size:15px;margin:18px 0 6px}
 .disc{font-size:11.5px;color:var(--muted);margin-top:28px;line-height:1.7}
 footer .glinks{margin-bottom:10px}
 .ins{padding-left:1.2em;font-size:14px;line-height:1.8}.ins li{margin:4px 0}
+.tw{overflow-x:auto;margin:8px 0 12px}
+.gt{width:100%;border-collapse:collapse;font-size:13.5px;background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.gt th,.gt td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+.gt th{background:var(--blush);font-weight:700;font-size:12.5px;white-space:nowrap}
+.gt tr:last-child td{border-bottom:0}
+.gcs{display:grid;gap:10px;margin:14px 0}
+.gc{display:grid;gap:4px;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px 16px;text-decoration:none;color:var(--fg)}
+.gc b{font-family:var(--serif);font-weight:600;font-size:16px}
+.gc span{font-size:13px;color:var(--muted);line-height:1.7}
 </style>
 </head>
 <body>
-<header><a class="logo" href="/"><i>¥</i>キレイネ<small>美容医療の最安値を比較</small></a></header>
+<header><a class="logo" href="/"><i>¥</i>キレイネ<small>美容医療の最安値を比較</small></a><nav class="hn"><a href="/guide/">料金の見方ガイド</a></nav></header>
 <main>
 <nav class="bc" aria-label="パンくず"><a href="/">トップ</a><span>›</span><b>埼玉県</b></nav>
-<h1>埼玉県の美容皮膚科 料金比較【3院】</h1><p class="lead">埼玉県の美容皮膚科・美容クリニック3院の料金を、公式サイトの料金表から施術別に比較できます。2026/11/06更新。</p><h2>施術から探す</h2><div class="links grid"><a href="/saitama/hair/">医療脱毛<small>2院</small></a><a href="/saitama/botox/">ボトックス<small>3院</small></a><a href="/saitama/filler/">ヒアルロン酸<small>1院</small></a><a href="/saitama/spot/">シミ・くすみ(IPL)<small>1院</small></a><a href="/saitama/booster/">リジュラン・肌育<small>1院</small></a></div><h2>埼玉県のクリニック一覧</h2><div class="links grid"><a href="/clinic/omiyakeisei/">おおみや形成スキンクリニック<small>さいたま市大宮区</small></a><a href="/clinic/mariaomiya/">大宮マリアクリニック<small>さいたま市大宮区</small></a><a href="/clinic/hadaomiya/">肌クリニック大宮<small>さいたま市大宮区</small></a></div><a class="cta" href="/">アプリで製剤・条件を絞り込んで比べる ›</a>
-<p class="disc">掲載料金は各クリニック公式サイトの掲載額(確認日時点)です。初診料・麻酔代などが別途かかる場合があり、最終的な金額・施術内容・リスクは診察でご確認ください。キレイネは特定の医療機関を推奨するものではなく、掲載院から広告費を受け取っていません。</p>
+<h1>埼玉県の美容皮膚科 料金比較【3院】</h1><p class="lead">埼玉県の美容皮膚科・美容クリニック3院の料金を、公式サイトの料金表から施術別に比較できます。2026/11/06更新。</p><h2>埼玉県の料金の目安</h2><div class="tw"><table class="gt"><thead><tr><th>施術</th><th>掲載院</th><th>最安</th><th>中央値</th></tr></thead><tbody><tr><td>医療脱毛 両ワキ 5回</td><td>2院</td><td>16,000円</td><td>16,800円</td></tr><tr><td>ボトックス シワ 1部位(額など)</td><td>3院</td><td>18,500円</td><td>27,210円</td></tr><tr><td>ボトックス エラ(両側)</td><td>2院</td><td>39,800円</td><td>63,900円</td></tr><tr><td>ヒアルロン酸 1cc</td><td>1院</td><td>39,800円</td><td>49,800円</td></tr></tbody></table></div><p class="note">埼玉県の単独院(全国チェーンを除く)の通常価格から計算。2026/11/06時点。比べ方は<a href="/guide/">料金の見方ガイド</a>をご覧ください。</p><h2>施術から探す</h2><div class="links grid"><a href="/saitama/hair/">医療脱毛<small>2院</small></a><a href="/saitama/botox/">ボトックス<small>3院</small></a><a href="/saitama/filler/">ヒアルロン酸<small>1院</small></a><a href="/saitama/spot/">シミ・くすみ(IPL)<small>1院</small></a><a href="/saitama/booster/">リジュラン・肌育<small>1院</small></a></div><h2>埼玉県のクリニック一覧</h2><div class="links grid"><a href="/clinic/omiyakeisei/">おおみや形成スキンクリニック<small>さいたま市大宮区</small></a><a href="/clinic/mariaomiya/">大宮マリアクリニック<small>さいたま市大宮区</small></a><a href="/clinic/hadaomiya/">肌クリニック大宮<small>さいたま市大宮区</small></a></div><a class="cta" href="/">アプリで製剤・条件を絞り込んで比べる ›</a>
+<p class="disc">掲載料金は各クリニック公式サイトの掲載額(確認日時点)です。初診料・麻酔代などが別途かかる場合があり、最終的な金額・施術内容・リスクは診察でご確認ください。キレイネは特定の医療機関を推奨するものではなく、掲載院から掲載料・紹介料を受け取っていません。並び順は料金データだけで決めています。</p>
 </main>
-<footer><nav class="glinks"><a href="/hair/">医療脱毛</a><a href="/botox/">ボトックス</a><a href="/filler/">ヒアルロン酸</a><a href="/spot/">シミ・くすみ(IPL)</a><a href="/booster/">リジュラン・肌育</a></nav><nav><a href="/">トップ</a><a href="/about.html">運営者情報</a><a href="/terms.html">利用規約</a><a href="/privacy.html">プライバシーポリシー</a><a href="/contact.html">お問い合わせ</a></nav><p>© 2026 キレイネ</p></footer>
+<footer><nav class="glinks"><a href="/hair/">医療脱毛</a><a href="/botox/">ボトックス</a><a href="/filler/">ヒアルロン酸</a><a href="/spot/">シミ・くすみ(IPL)</a><a href="/booster/">リジュラン・肌育</a></nav><nav><a href="/">トップ</a><a href="/guide/">料金の見方ガイド</a><a href="/guide/method/">編集方針</a><a href="/about.html">運営者情報</a><a href="/terms.html">利用規約</a><a href="/privacy.html">プライバシーポリシー</a><a href="/contact.html">お問い合わせ</a></nav><p>© 2026 キレイネ</p></footer>
 </body>
 </html>
