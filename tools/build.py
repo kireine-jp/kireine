@@ -72,7 +72,7 @@ def page(slug, title, body):
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>{title}｜キレイネ</title>
-<link rel="canonical" href="{SITE}/{slug}.html">
+<link rel="canonical" href="{SITE}/{slug}">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Noto+Serif+JP:wght@500;600&display=swap">
 <style>{css}</style>
@@ -83,7 +83,7 @@ def page(slug, title, body):
 <h1>{title}</h1>
 {body}
 </main>
-<footer><nav><a href="/">トップ</a><a href="/guide/">料金の見方ガイド</a><a href="/guide/method/">編集方針</a><a href="/about.html">運営者情報</a><a href="/terms.html">利用規約</a><a href="/privacy.html">プライバシーポリシー</a><a href="/contact.html">お問い合わせ</a></nav><p>© {datetime.date.today().year} キレイネ</p></footer>
+<footer><nav><a href="/">トップ</a><a href="/guide/">料金の見方ガイド</a><a href="/guide/method/">編集方針</a><a href="/about">運営者情報</a><a href="/terms">利用規約</a><a href="/privacy">プライバシーポリシー</a><a href="/contact">お問い合わせ</a></nav><p>© {datetime.date.today().year} キレイネ</p></footer>
 </body>
 </html>
 """
@@ -109,7 +109,7 @@ seo_urls += guides.generate(clinics, prices, updates, GROUPS,
 # ---- static extras ----
 today = datetime.date.today().isoformat()
 open(f"{OUT}/robots.txt", "w").write(f"User-agent: *\nAllow: /\nSitemap: {SITE}/sitemap.xml\n")
-urls = [""] + sorted(seo_urls) + ["about.html", "terms.html", "privacy.html", "contact.html"]
+urls = [""] + sorted(seo_urls) + ["about", "terms", "privacy", "contact"]
 open(f"{OUT}/sitemap.xml", "w").write('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' +
     "".join(f"<url><loc>{SITE}/{u}</loc><lastmod>{today}</lastmod></url>\n" for u in urls) + "</urlset>\n")
 open(f"{OUT}/_headers", "w").write("/tools/*\n  X-Robots-Tag: noindex\n/ig/*\n  X-Robots-Tag: noindex\n/data/*\n  Cache-Control: public, max-age=600\n  X-Robots-Tag: noindex\n/*\n  X-Content-Type-Options: nosniff\n  Referrer-Policy: strict-origin-when-cross-origin\n")

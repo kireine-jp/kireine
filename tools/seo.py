@@ -80,7 +80,7 @@ def write_page(OUT, SITE, groups, css, path, title, desc, crumbs, body, extra_he
 {body}
 <p class="disc">掲載料金は各クリニック公式サイトの掲載額(確認日時点)です。初診料・麻酔代などが別途かかる場合があり、最終的な金額・施術内容・リスクは診察でご確認ください。キレイネは特定の医療機関を推奨するものではなく、掲載院から掲載料・紹介料を受け取っていません。並び順は料金データだけで決めています。</p>
 </main>
-<footer><nav class="glinks">{''.join(f'<a href="/{g["id"]}/">{esc(g["name"])}</a>' for g in groups)}</nav><nav><a href="/">トップ</a><a href="/guide/">料金の見方ガイド</a><a href="/guide/method/">編集方針</a><a href="/about.html">運営者情報</a><a href="/terms.html">利用規約</a><a href="/privacy.html">プライバシーポリシー</a><a href="/contact.html">お問い合わせ</a></nav><p>© {datetime.date.today().year} キレイネ</p></footer>
+<footer><nav class="glinks">{''.join(f'<a href="/{g["id"]}/">{esc(g["name"])}</a>' for g in groups)}</nav><nav><a href="/">トップ</a><a href="/guide/">料金の見方ガイド</a><a href="/guide/method/">編集方針</a><a href="/about">運営者情報</a><a href="/terms">利用規約</a><a href="/privacy">プライバシーポリシー</a><a href="/contact">お問い合わせ</a></nav><p>© {datetime.date.today().year} キレイネ</p></footer>
 </body>
 </html>
 """
@@ -367,4 +367,4 @@ def home_links(clinics, prices, groups):
         if c.get("scope") != "national" and c.get("pref") in PREF_SLUG: loc[c["pref"]] = loc.get(c["pref"], 0) + 1
     g = "".join(f'<a href="/{x["id"]}/">{html.escape(x["name"])}の料金相場</a>' for x in groups)
     p = "".join(f'<a href="/{PREF_SLUG[k]}/">{html.escape(k)}</a>' for k, _ in PREFS if k in loc)
-    return f'<footer class="kn-seo"><b>施術から探す</b><nav>{g}</nav><b>都道府県から探す</b><nav>{p}</nav><nav class="kn-legal"><a href="/guide/">料金の見方ガイド</a><a href="/guide/method/">編集方針</a><a href="/about.html">運営者情報</a><a href="/terms.html">利用規約</a><a href="/privacy.html">プライバシーポリシー</a><a href="/contact.html">お問い合わせ</a></nav></footer>'
+    return f'<footer class="kn-seo"><b>施術から探す</b><nav>{g}</nav><b>都道府県から探す</b><nav>{p}</nav><nav class="kn-legal"><a href="/guide/">料金の見方ガイド</a><a href="/guide/method/">編集方針</a><a href="/about">運営者情報</a><a href="/terms">利用規約</a><a href="/privacy">プライバシーポリシー</a><a href="/contact">お問い合わせ</a></nav></footer>'
