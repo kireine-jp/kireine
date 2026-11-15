@@ -1,46 +1,44 @@
 {
- "_note": "投稿の作り方の設定。毎週の成果レポート(ig/report/)を見て調整。screen=実際のサイト画面をスマホで見せるリール(人っぽさ重視)。 リールはオーナーがアプリで音楽を付けて手動投稿(manual_reels)。 2026-10-30: オーナーが毎日リールを投稿する方針 → リール5:カルーセル2のパターン、keep=3、未投稿リールが常に1本以上(min_reels=1)。 2026-11-02: 週次でヒアル(filler-tokyo)の画面リールがリーチ85で突出、リジュラン18・東京ボトックス19が続き、銀座ボトックス/エラは低め → filler・booster を各リスト先頭へ、銀座系を後ろへ。カルーセルはリーチ1だが2本だけで材料不足なのでpatternは据え置き。 2026-11-09: 画面リール(screen)がヒアル銀座169・リジュラン東京123・ヒアル東京85と上位を独占、通常リールは最高47 → patternをscreen3:reel2:card2に。ヒアル/リジュランを先頭へ、ボトックス池袋・恵比寿(リーチ1)は後ろへ。エラ銀座は2週続けて下位(4→5)なので外す。カルーセルは自動投稿オフ(IG_AUTO)で材料なし、据え置き。",
+ "_note": "投稿の作り方の設定。毎週の成果レポート(ig/report/)を見て調整。screen=実際のサイト画面をスマホで見せるリール(人っぽさ重視)。 リールはオーナーがアプリで音楽を付けて手動投稿(manual_reels)。 2026-10-30: オーナーが毎日リールを投稿する方針 → リール5:カルーセル2のパターン、keep=3、未投稿リールが常に1本以上(min_reels=1)。 2026-11-02: 週次でヒアル(filler-tokyo)の画面リールがリーチ85で突出、リジュラン18・東京ボトックス19が続き、銀座ボトックス/エラは低め → filler・booster を各リスト先頭へ、銀座系を後ろへ。カルーセルはリーチ1だが2本だけで材料不足なのでpatternは据え置き。 2026-11-09: 画面リール(screen)がヒアル銀座169・リジュラン東京123・ヒアル東京85と上位を独占、通常リールは最高47 → patternをscreen3:reel2:card2に。ヒアル/リジュランを先頭へ、ボトックス池袋・恵比寿(リーチ1)は後ろへ。エラ銀座は2週続けて下位(4→5)なので外す。カルーセルは自動投稿オフ(IG_AUTO)で材料なし、据え置き。 2026-11-16: 今週も画面リール(screen)が強い(リジュラン東京197・ヒアル表参道146、screen平均約100 vs reel平均約43)。通常リールでは光治療(spot-tokyo)が110で突出、恵比寿ボトックス51 → patternをscreen4:reel2:card1に、spot・booster・filler表参道を先頭へ。ボトックス銀座は2週続けて最下位圏(3→5)なので外す。カルーセルは未投稿のままで材料なし。",
  "pattern": [
+  "screen",
   "reel",
   "screen",
   "card",
   "screen",
   "reel",
-  "screen",
-  "card"
+  "screen"
  ],
  "keep": 3,
  "reel": [
+  "spot-tokyo",
   "booster-tokyo",
+  "filler-omotesando",
   "filler-tokyo",
   "filler-ginza",
-  "filler-omotesando",
+  "botox-ebisu",
   "botox-tokyo",
   "botox-omotesando",
   "jaw-ebisu",
   "jaw-ikebukuro",
-  "botox-ginza",
-  "spot-tokyo",
-  "botox-ebisu",
   "botox-ikebukuro"
  ],
  "card": [
-  "filler-tokyo",
   "booster-tokyo",
-  "botox-tokyo",
+  "filler-tokyo",
   "spot-tokyo",
+  "botox-tokyo",
   "hair-tokyo"
  ],
  "screen": [
-  "filler-omotesando",
   "booster-tokyo",
-  "filler-ginza",
+  "filler-omotesando",
+  "spot-tokyo",
   "filler-tokyo",
+  "filler-ginza",
   "botox-tokyo",
   "botox-omotesando",
-  "spot-tokyo",
   "botox-ebisu",
-  "botox-ginza",
   "botox-ikebukuro"
  ],
  "manual_reels": true,
