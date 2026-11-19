@@ -128,7 +128,7 @@ def souba():
         f'''<div class="s"><p class="k fade" style="color:{DARK}">ちなみに{e(T["place"])}の“相場”は</p>
 <div class="pop serif" style="animation-delay:.2s;font-size:170px;margin:40px 0 20px;line-height:1">¥{yen(round(med, -2))}</div>
 <p class="up" style="animation-delay:.4s;font-size:46px;color:{MUTE}">{e(T["unit"])}・掲載{len(R)}院の中央値</p>
-<p class="up" style="animation-delay:.8s;font-size:60px;font-weight:700;margin-top:80px;line-height:1.5">1位なら相場より<br><span style="color:{DARK};background:{ACC};padding:0 14px;border-radius:12px">¥{yen(med - lo)}</span> おトク。</p></div></body></html>''')
+<p class="up" style="animation-delay:.8s;font-size:60px;font-weight:700;margin-top:80px;line-height:1.5">1位なら相場より<br><span style="color:{DARK};background:{ACC};padding:0 14px;border-radius:12px">¥{yen(round(med, -2) - lo)}</span> おトク。</p></div></body></html>''')
 
 def cta():
     return (BASE + f'<div style="position:absolute;inset:0;background:{DARK}"></div>' + brand(PAPER) +
