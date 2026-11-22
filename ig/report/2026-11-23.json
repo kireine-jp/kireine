@@ -1,0 +1,23 @@
+{
+ "date": "2026-11-23",
+ "followers": null,
+ "media_count": null,
+ "week": {
+  "reach": null,
+  "profile_views": null,
+  "website_clicks": null,
+  "accounts_engaged": null,
+  "follows_and_unfollows": null
+ },
+ "posts": [],
+ "notes": [
+  "17841462444979218 : 400 {\"error\":{\"message\":\"API access blocked.\",\"type\":\"OAuthException\",\"code\":200,\"error_subcode\":5258005,\"fbtrace_id\":\"AtF_JkMGKlYwr0auwoi9h3c\"}}",
+  "media : 400 {\"error\":{\"message\":\"API access blocked.\",\"type\":\"OAuthException\",\"code\":200,\"error_subcode\":5258005,\"fbtrace_id\":\"AHCEJzQJr0VjX4u0B3hMBra\"}}",
+  "insights reach: 400 {\"error\":{\"message\":\"API access blocked.\",\"type\":\"OAuthException\",\"code\":200,\"error_subcode\":5258005,\"fbtrace_id\":\"AVbd_C8Dvw0ba3JKhcztkIS\"}}",
+  "insights profile_views: 400 {\"error\":{\"message\":\"API access blocked.\",\"type\":\"OAuthException\",\"code\":200,\"error_subcode\":5258005,\"fbtrace_id\":\"AEQWMPtBytC2G9fZySCSl7h\"}}",
+  "insights website_clicks: 400 {\"error\":{\"message\":\"API access blocked.\",\"type\":\"OAuthException\",\"code\":200,\"error_subcode\":5258005,\"fbtrace_id\":\"AQtzGTNEE_CUvDRQ6bZs2nG\"}}",
+  "insights accounts_engaged: 400 {\"error\":{\"message\":\"API access blocked.\",\"type\":\"OAuthException\",\"code\":200,\"error_subcode\":5258005,\"fbtrace_id\":\"A2aSsvzq57oX55TiFt4f7hU\"}}",
+  "insights follows_and_unfollows: 400 {\"error\":{\"message\":\"API access blocked.\",\"type\":\"OAuthException\",\"code\":200,\"error_subcode\":5258005,\"fbtrace_id\":\"ADu7rJ-mZ7k4abB5BGXNt83\"}}"
+ ],
+ "followers_prev": 3
+}
