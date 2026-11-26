@@ -110,9 +110,36 @@ seo_urls += guides.generate(clinics, prices, updates, GROUPS,
 today = datetime.date.today().isoformat()
 open(f"{OUT}/robots.txt", "w").write(f"User-agent: *\nAllow: /\nSitemap: {SITE}/sitemap.xml\n")
 urls = [""] + sorted(seo_urls) + ["about", "terms", "privacy", "contact"]
+# lastmod は「中身が実際に変わった日」だけ進める(毎日全URLを今日にすると Google が lastmod を信用しなくなる)
+import hashlib
+LM_PATH = f"{HERE}/lastmod.json"
+try: LM = json.load(open(LM_PATH, encoding="utf-8"))
+except Exception: LM = {}
+DATE_RE = re.compile(r"\d{4}[/.-]\d{1,2}[/.-]\d{1,2}|\d{4}年\d{1,2}月\d{1,2}日|\d{1,2}月\d{1,2}日|©\s*\d{4}")
+def page_file(u):
+    if u == "": return f"{OUT}/index.html"
+    if u.endswith("/"): return f"{OUT}/{u}index.html"
+    return f"{OUT}/{u}.html"
+def content_hash(u):
+    try: t = open(page_file(u), encoding="utf-8").read()
+    except FileNotFoundError: return None
+    if u == "":  # トップはアプリ本体。データの更新ログ(日付入り)は除いて本文だけで判定
+        t = re.sub(r"<script>window\.KIREINE_PUBLIC.*?</script>", "", t, flags=re.S)
+    return hashlib.sha1(DATE_RE.sub("", t).encode()).hexdigest()[:16]
+lm_new = {}
+for u in urls:
+    h = content_hash(u)
+    old = LM.get(u)
+    lm_new[u] = old if (old and old.get("h") == h) else {"h": h, "d": today}
+json.dump(lm_new, open(LM_PATH, "w", encoding="utf-8"), ensure_ascii=False, indent=0, sort_keys=True)
 open(f"{OUT}/sitemap.xml", "w").write('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' +
-    "".join(f"<url><loc>{SITE}/{u}</loc><lastmod>{today}</lastmod></url>\n" for u in urls) + "</urlset>\n")
+    "".join(f"<url><loc>{SITE}/{u}</loc><lastmod>{lm_new[u]['d']}</lastmod></url>\n" for u in urls) + "</urlset>\n")
+n_changed = sum(1 for u in urls if lm_new[u]["d"] == today and (LM.get(u) or {}).get("h") != lm_new[u]["h"])
+print("sitemap lastmod updated:", n_changed, "of", len(urls))
 open(f"{OUT}/_headers", "w").write("/tools/*\n  X-Robots-Tag: noindex\n/ig/*\n  X-Robots-Tag: noindex\n/data/*\n  Cache-Control: public, max-age=600\n  X-Robots-Tag: noindex\n/*\n  X-Content-Type-Options: nosniff\n  Referrer-Policy: strict-origin-when-cross-origin\n")
+# 統合・削除したページの恒久リダイレクト(Cloudflare Pages の _redirects)
+if os.path.exists(f"{HERE}/redirects.txt"):
+    shutil.copy(f"{HERE}/redirects.txt", f"{OUT}/_redirects")
 import shutil
 for f in ("favicon.svg", "og.png", "apple-touch-icon.png", "mascot.jpg", "mascot@2x.jpg"):
     shutil.copy(f"{HERE}/{f}", f"{OUT}/{f}")

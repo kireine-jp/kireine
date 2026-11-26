@@ -346,7 +346,7 @@ def generate(OUT, clinics, prices, updates, groups, css, SITE):
                 title = f'{label}の{g["name"]}料金比較・最安値【{n}院｜{lastj}更新】｜キレイネ'
                 desc = f'{where}の{g["name"]}の料金を{n}院の公式サイトから比較。' + (f'{g["subs"][0][1]}は最安{yen(st[0])}円。' if st else "") + "安い順にわかります。"
                 write(f'{slug}/{aslug}/{g["id"]}', title, desc, [("トップ", "/"), (pref, f'/{slug}/'), (g["name"], f'/{slug}/{g["id"]}/'), (label, f'/{slug}/{aslug}/{g["id"]}/')], body, noindex=n < MIN_INDEX)
-        cl = sorted(ids, key=lambda i: C[i]["name"])
+        cl = sorted(ids, key=lambda i: (C[i]["name"], i))
         clinic_links = "".join(f'<a href="/clinic/{esc(i)}/">{esc(C[i]["name"])}<small>{esc(C[i].get("area",""))}</small></a>' for i in cl if any(p["clinicId"] == i for p in P))
         area_links = "".join(f'<a href="/{slug}/{a}/{g["id"]}/">{esc(v[1])}の{esc(g["short"])}</a>' for a, v in sorted(areas.items(), key=lambda x: (-len(x[1][2]), x[0])) for g in groups
                              if len({p["clinicId"] for p in P if p["clinicId"] in v[2] and CAT2G.get(p["cat"]) is g}) >= 2)
