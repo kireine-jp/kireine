@@ -143,4 +143,17 @@ if os.path.exists(f"{HERE}/redirects.txt"):
 import shutil
 for f in ("favicon.svg", "og.png", "apple-touch-icon.png", "mascot.jpg", "mascot@2x.jpg"):
     shutil.copy(f"{HERE}/{f}", f"{OUT}/{f}")
+# ---- Google アナリティクス(GA4)を公開ページ全体に挿入(/ig/ /tools/ は除外) ----
+GA_ID = OP.get("GA4_ID", "")
+if GA_ID:
+    GA = (f'<script async src="https://www.googletagmanager.com/gtag/js?id={GA_ID}"></script>'
+          f"<script>window.dataLayer=window.dataLayer||[];function gtag(){{dataLayer.push(arguments);}}gtag('js',new Date());gtag('config','{GA_ID}');</script>\n")
+    for root, dirs, files in os.walk(OUT):
+        rel = os.path.relpath(root, OUT)
+        if rel.split(os.sep)[0] in (".git", "tools", "ig", "data", ".github"): dirs[:] = []; continue
+        for fn in files:
+            if not fn.endswith(".html"): continue
+            fp = os.path.join(root, fn); t = open(fp, encoding="utf-8").read()
+            if "googletagmanager.com/gtag/js" in t or "</head>" not in t: continue
+            open(fp, "w", encoding="utf-8").write(t.replace("</head>", GA + "</head>", 1))
 print("built", n_cl, "clinics", n_pr, "prices", len(updates), "updates", len(seo_urls), "seo pages")
