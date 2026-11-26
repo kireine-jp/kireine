@@ -466,6 +466,14 @@ main{padding-top:24px;gap:30px}
 .ghero.photo{background:var(--tint);min-height:200px}
 .ghero.photo>*:not(.ph-img){position:relative;z-index:2;max-width:62%}
 .ghero.photo .ph-img{width:55%}
+.regs{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin:10px -2px 0;padding:2px}
+.regs::-webkit-scrollbar{display:none}
+.regs button,.regs select{flex:none;border:1px solid var(--line);background:var(--card);color:var(--fg);border-radius:999px;padding:7px 13px;font:inherit;font-size:13px}
+.regs button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:700}
+.regs select{appearance:none;-webkit-appearance:none;color:var(--muted)}
+.card.follow{align-items:flex-start}
+.card.follow .fl{display:flex;gap:8px;margin-top:8px}
+.card.follow .fl a{border:1px solid var(--accent);color:var(--accent);border-radius:999px;padding:5px 12px;font-size:12.5px;font-weight:700;text-decoration:none}
 </style>
 
 <header class="top"><div class="wrap" id="topbar"></div></header>
@@ -560,6 +568,10 @@ const locLabel=c=>c?(c.scope==="national"?"全国チェーン":((c.pref||"")+(c.
 const isLiked=id=>S.likes.includes(id);
 function toggleLike(id){S.likes=isLiked(id)?S.likes.filter(x=>x!==id):[...S.likes,id];try{localStorage.setItem("bhp-likes",JSON.stringify(S.likes))}catch(e){}toast(isLiked(id)?"お気に入りに追加しました":"お気に入りから外しました");render()}
 function toast(t){const el=$("#toast");el.textContent=t;el.hidden=false;clearTimeout(S.tt);S.tt=setTimeout(()=>el.hidden=true,1800)}
+const inReg=p=>{const r=S.cmp.pref;if(!r)return true;const c=S.clinics[p.clinicId];return!!c&&c.pref===r&&c.scope!=="national"};
+const effKey=p=>key(p)*(p.tax?1:1.1);
+function lowestR(cat){const ps=S.prices.filter(p=>p.cat===cat&&p.cond==="通常"&&inReg(p));return ps.length?ps.reduce((a,b)=>effKey(b)<effKey(a)||(effKey(b)===effKey(a)&&b.tax&&!a.tax)?b:a):null}
+const REGS=()=>{const n={};Object.values(S.clinics).forEach(c=>{if(c.scope!=="national"&&c.pref)n[c.pref]=(n[c.pref]||0)+1});return n};
 function lowest(cat){const ps=S.prices.filter(p=>p.cat===cat&&p.cond==="通常");return ps.length?ps.reduce((a,b)=>key(b)<key(a)?b:a):null}
 function groupLowest(g){let b=null;g.subs.forEach(s=>{const l=lowest(s[0]);if(l&&(!b||l.price<b.price))b=l});return b}
 function statsOf(cat){const v=S.prices.filter(p=>p.cat===cat&&p.cond==="通常").map(key).sort((a,b)=>a-b);if(!v.length)return null;const m=v.length%2?v[(v.length-1)/2]:(v[v.length/2-1]+v[v.length/2])/2;return{min:v[0],med:m,max:v[v.length-1],n:v.length}}
@@ -600,38 +612,48 @@ function skeleton(){return '<div class="sk" style="height:46px"></div><div class
 function hcard(p){const g=CAT2G[p.cat],c=S.clinics[p.clinicId];
   return '<button class="hc" data-clinic="'+esc(p.clinicId)+'"><div class="thumb g-'+g.id+'"><span class="lab">'+esc(g.short)+'</span><span class="art">'+ART[g.id]+'</span></div><div class="body"><span class="pd">'+esc(SUBNAME(p.cat))+'</span><span class="cn">'+esc(c?.name||"")+'</span><span class="pr">'+yen(p.price)+'<small>円〜</small></span><span class="pd">'+esc(p.product)+'</span></div></button>'}
 function discountOf(p){if(p.cond==="通常")return null;const base=S.prices.find(x=>x.clinicId===p.clinicId&&x.cat===p.cat&&x.cond==="通常"&&x.product===p.product&&x.units==p.units&&x.cc==p.cc);if(!base||base.price<=p.price)return null;return{from:base.price,pct:Math.round((1-p.price/base.price)*100)}}
-function dealCard(p){const g=CAT2G[p.cat],c=S.clinics[p.clinicId],ra=revAgg(p.clinicId),d=discountOf(p),low=lowest(p.cat);
-  const b=[];if(low&&low.id===p.id)b.push('<span class="w">最安</span>');if(p.changed&&p.changed.from>p.price)b.push('<span class="w">値下げ</span>');if(COND[p.cond])b.push('<span>'+COND[p.cond]+'</span>');
-  const up=unitPrice(p);
-  return '<button class="dc" data-clinic="'+esc(p.clinicId)+'"><span class="ph g-'+g.id+'" style="--tint:'+TINT[g.id]+'">'+photo(g.id)+'<span class="bdg">'+b.join("")+'</span><span class="k">'+esc(g.short)+'</span><span class="h">'+esc(SUBNAME(p.cat))+'</span><span class="bp">'+yen(p.price)+'<small>円</small></span></span>'+
-   '<span class="bd">'+(ra.n?'<span class="rt"><i>★</i><b>'+ra.avg.toFixed(1)+'</b>('+ra.n+')</span>':'')+'<span class="ti">'+esc(p.product)+(p.units?' '+p.units+'単位':p.cc&&p.cc!==1?' '+p.cc+'cc':'')+'</span><span class="lo">'+esc(c?.name||"")+' · '+esc(c?.scope==="national"?"全国":(c?.pref||""))+'</span>'+
-   (d?'<span class="pr"><em>'+d.pct+'%OFF</em><s>通常 '+yen(d.from)+'円</s></span>':up?'<span class="pr"><span class="xs" style="color:var(--accent);font-weight:700">'+(p.units?'1単位':'1cc')+'あたり '+yen(Math.round(up))+'円</span></span>':'')+(p.tax?'':'<span class="xs" style="color:var(--warn)">税表記要確認</span>')+'</span></button>'}
+function dealCard(p,showPhoto=true){const g=CAT2G[p.cat],c=S.clinics[p.clinicId],ra=revAgg(p.clinicId),d=discountOf(p),low=lowestR(p.cat);
+  const b=[];if(low&&low.id===p.id)b.push('<span class="w">いちばん安い</span>');if(p.changed&&p.changed.from>p.price)b.push('<span class="w">値下げ</span>');if(COND[p.cond])b.push('<span>'+COND[p.cond]+'</span>');
+  const up=unitPrice(p),perCC=p.cat==="rejuran"&&p.cc&&p.cc!==1;
+  const big=perCC?Math.round(p.price/p.cc):p.price;
+  let pr="";
+  if(perCC)pr='<span class="pr"><span class="xs muted">'+p.cc+'cc 合計 '+yen(p.price)+'円</span></span>';
+  else if(d)pr='<span class="pr"><span class="xs muted">通常価格 '+yen(d.from)+'円</span></span>';
+  else if(up)pr='<span class="pr"><span class="xs muted">'+(p.units?'1単位':'1cc')+'あたり '+yen(Math.round(up))+'円</span></span>';
+  const tax=p.tax?'':'<span class="xs" style="color:var(--warn)">税込か未確認 · 税抜なら約'+yen(Math.round(p.price*1.1))+'円</span>';
+  return '<button class="dc'+(showPhoto?'':' np')+'" data-clinic="'+esc(p.clinicId)+'"><span class="ph g-'+g.id+'" style="--tint:'+TINT[g.id]+'">'+(showPhoto?photo(g.id):'')+'<span class="bdg">'+b.join("")+'</span><span class="k">'+esc(g.short)+'</span><span class="h">'+esc(SUBNAME(p.cat))+'</span><span class="bp">'+yen(big)+'<small>'+(perCC?'円/1cc':'円')+'</small></span></span>'+
+   '<span class="bd">'+(ra.n?'<span class="rt"><i>★</i><b>'+ra.avg.toFixed(1)+'</b>('+ra.n+')</span>':'')+'<span class="ti">'+esc(p.product)+(p.units?' '+p.units+'単位':p.cc&&p.cc!==1?' '+p.cc+'cc':'')+'</span><span class="lo">'+esc(c?.name||"")+' · '+esc(c?.scope==="national"?"全国":(c?.pref||""))+'</span>'+pr+tax+'</span></button>'}
 function homeDeals(){
   if(S.htab==="rec"){const out=[],seen=new Set();
-    GROUPS.forEach(g=>g.subs.forEach(s=>{const l=lowest(s[0]);if(l){out.push(l);seen.add(l.id)}}));
-    S.prices.filter(p=>discountOf(p)&&!seen.has(p.id)).sort((a,b)=>discountOf(b).pct-discountOf(a).pct).slice(0,6).forEach(p=>{out.push(p);seen.add(p.id)});
+    GROUPS.forEach(g=>g.subs.forEach(s=>{const l=lowestR(s[0]);if(l){out.push(l);seen.add(l.id)}}));
+    S.prices.filter(p=>inReg(p)&&discountOf(p)&&!seen.has(p.id)).sort((a,b)=>discountOf(b).pct-discountOf(a).pct).slice(0,6).forEach(p=>{out.push(p);seen.add(p.id)});
     return out}
   const g=GROUPS.find(x=>x.id===S.htab);if(!g)return[];
-  const ps=S.prices.filter(p=>CAT2G[p.cat]===g);const best={};
-  ps.forEach(p=>{const k=p.clinicId+"|"+p.cat;if(!best[k]||key(p)<key(best[k]))best[k]=p});
-  return Object.values(best).sort((a,b)=>(g.subs.findIndex(s=>s[0]===a.cat)-g.subs.findIndex(s=>s[0]===b.cat))||key(a)-key(b))}
+  const ps=S.prices.filter(p=>CAT2G[p.cat]===g&&inReg(p));const best={};
+  ps.forEach(p=>{const k=p.clinicId+"|"+p.cat;if(!best[k]||effKey(p)<effKey(best[k]))best[k]=p});
+  return Object.values(best).sort((a,b)=>(g.subs.findIndex(s=>s[0]===a.cat)-g.subs.findIndex(s=>s[0]===b.cat))||effKey(a)-effKey(b))}
+function regionChips(){const n=REGS(),r=S.cmp.pref;const top=Object.keys(n).sort((a,b)=>n[b]-n[a]).slice(0,6);if(r&&!top.includes(r))top.push(r);
+  const rest=PREFS.filter(p=>n[p]&&!top.includes(p));
+  return '<div class="regs" role="group" aria-label="エリアを選ぶ"><button data-hpref=""'+(r?'':' aria-pressed="true"')+'>全国</button>'+top.map(p=>'<button data-hpref="'+esc(p)+'"'+(r===p?' aria-pressed="true"':'')+'>'+esc(p.replace(/[都府県]$/,""))+'</button>').join("")+
+   (rest.length?'<select data-hpref-sel aria-label="ほかの都道府県"><option value="">ほか ▾</option>'+rest.map(p=>'<option value="'+esc(p)+'">'+esc(p)+'('+n[p]+')</option>').join("")+'</select>':'')+'</div>'}
 function vHome(){
   const nC=Object.keys(S.clinics).length,nP=S.prices.length,u=S.updates[0];
   const LOW=[["wrinkle","シワボトックス"],["jaw","エラボトックス"],["filler","ヒアルロン酸 1cc"],["rejuran","リジュラン 1cc"]].map(([c,n])=>{
-    const ps=S.prices.filter(p=>p.cat===c&&p.cond==="通常"&&(c!=="rejuran"||p.cc));if(!ps.length||!CAT2G[c])return"";
+    const ps=S.prices.filter(p=>p.cat===c&&p.cond==="通常"&&inReg(p)&&(c!=="rejuran"||p.cc));if(!ps.length||!CAT2G[c])return"";
     const m=Math.min(...ps.map(key));return'<button class="lowc" data-cmp="'+CAT2G[c].id+'|'+c+'"><span>'+esc(n)+'</span><b>¥'+yen(Math.round(m))+'<small>〜</small></b></button>'}).join("");
-  let h='<section class="hero"><h1>美容医療、<br>いちばん安いのはどこ？</h1>'+(LOW?'<div class="lowg">'+LOW+'</div><p class="lown">全国'+nC+'院の公式料金(税込・通常価格)から、今日の最安値</p>':'')+
-   '<button class="sbar" data-search>'+IC.search+'<span>エラボトックス、大阪だといくら?</span></button>'+
-   '<div class="hstats"><div><b>'+nC+'</b><span>掲載クリニック</span></div><div><b>'+nP+'</b><span>公式料金</span></div><div><b>'+(u?esc(u.date.slice(5).replace("-","/")):"毎日")+'</b><span>最終更新</span></div></div></section>';
+  let h='<section class="hero"><h1>美容医療、<br>いちばん安いのはどこ？</h1>'+(LOW?'<div class="lowg">'+LOW+'</div><p class="lown">'+(S.cmp.pref?esc(S.cmp.pref)+'の'+(REGS()[S.cmp.pref]||0)+'院(全国チェーンを除く)':'全国'+nC+'院')+'の公式料金(通常価格)から、今日いちばん安い料金</p>':'')+
+   '<button class="sbar" data-search>'+IC.search+'<span>エラボトックス、大阪だといくら?</span></button>'+regionChips()+
+   '<div class="hstats"><div><b>'+(S.cmp.pref?(REGS()[S.cmp.pref]||0):nC)+'</b><span>'+(S.cmp.pref?esc(S.cmp.pref.replace(/[都府県]$/,""))+'のクリニック':'掲載クリニック')+'</span></div><div><b>'+(S.cmp.pref?S.prices.filter(inReg).length:nP)+'</b><span>公式料金</span></div><div><b>'+(u?esc(u.date.slice(5).replace("-","/")):"毎日")+'</b><span>最終更新</span></div></div></section>';
   const tabs=[["rec","おすすめ"]].concat(GROUPS.map(g=>[g.id,g.short]));
   h+='<div class="htabs" role="tablist">'+tabs.map(t=>'<button role="tab" data-htab="'+t[0]+'" aria-selected="'+(S.htab===t[0])+'">'+esc(t[1])+'</button>').join("")+'</div>';
   const deals=homeDeals();const g=GROUPS.find(x=>x.id===S.htab);
   h+='<section><div class="sh"><div><h2>'+(g?esc(g.name)+'の安い順':'今いちばん安いメニュー')+'</h2><p>'+(g?'クリニックごとの最安値 · '+deals.length+'件':'施術ごとの最安値と、初回・モニターの割引')+'</p></div>'+(g?'<button class="more" data-guide="'+g.id+'">相場・効果 ›</button>':'')+'</div>';
-  h+=deals.length?'<div class="grid2">'+deals.slice(0,g?20:16).map(dealCard).join("")+'</div>':'<div class="empty">'+IC.empty+'<span>まだ料金がありません</span></div>';
+  const _seen=new Set();h+=deals.length?'<div class="grid2">'+deals.slice(0,g?20:16).map(p=>{const gid=CAT2G[p.cat].id,f=!_seen.has(gid);_seen.add(gid);return dealCard(p,f)}).join("")+'</div>':'<div class="empty">'+IC.empty+'<span>'+(S.cmp.pref?esc(S.cmp.pref)+'の料金はまだ少なめです。<br><small>毎日追加しています。「全国」でも探せます</small>':'まだ料金がありません')+'</span></div>';
   if(g)h+='<div style="margin-top:12px"><button class="morebtn" data-cmp="'+g.id+'|'+g.subs[0][0]+'">'+esc(g.name)+'をすべて比較する ›</button></div>';
   h+='</section>';
+  if(PUBLIC)h+='<section><div class="card nk follow"><img src="/mascot.jpg" srcset="/mascot.jpg 1x, /mascot@2x.jpg 2x" alt="" width="48" height="48"><div><b>値下げ・新しいクリニックをお知らせ</b><span>毎日の料金チェックで見つけた変化を、SNSで発信しています。</span><div class="fl"><a href="https://www.instagram.com/kireine_jp/" target="_blank" rel="noopener">Instagram</a><a href="https://www.threads.com/@kireine_jp" target="_blank" rel="noopener">Threads</a></div></div></div></section>';
   h+='<section><div class="sh"><h2>使い方はかんたん</h2></div><div class="steps"><div class="step"><b>1</b><span>施術を選ぶ</span></div><div class="step"><b>2</b><span>安い順に比べる</span></div><div class="step"><b>3</b><span>'+(BOOKING?'予約リクエスト':'公式サイトで予約')+'</span></div></div></section>';
-  h+='<section><div class="sh"><div><h2>人気施術ランキング</h2><p>国内の非外科的施術の件数(2022年)</p></div></div><div class="card rank">'+
+  h+='<section><div class="sh"><div><h2>よく受けられている施術</h2><p>国内の非外科的施術の件数(2022年)</p></div></div><div class="card rank">'+
     STAT.map((r,i)=>'<div class="rk-row'+(r[0]?' link':'')+'"'+(r[0]?' data-guide="'+r[0]+'" role="button" tabindex="0"':'')+'><b class="n">'+(i+1)+'</b><span>'+esc(r[1])+'<span class="bar"><span style="width:'+(r[2]/61.2*100)+'%"></span></span></span><em>'+r[2]+'万件</em></div>').join("")+
     '<div class="xs muted">出典:日本美容外科学会 美容医療実態調査(厚生労働省 検討会資料より)</div></div></section>';
   const recent=[...S.reviews].sort((a,b)=>(b.createdAt||0)-(a.createdAt||0)).slice(0,3);
@@ -905,6 +927,9 @@ function bind(){
   root.querySelectorAll("[data-guide]").forEach(b=>{const f=e=>{if(e.type==="keydown"&&e.key!=="Enter")return;push({name:"guide",id:b.dataset.guide})};b.onclick=f;b.onkeydown=f});
   root.querySelectorAll("[data-cmp]").forEach(b=>b.onclick=()=>{const[g,c]=b.dataset.cmp.split("|");S.cmp.group=g;S.cmp.cat=c;S.cmp.origin="";tabGo("compare")});
   root.querySelectorAll("[data-clinic]").forEach(b=>b.onclick=e=>{if(e.target.closest("[data-like]"))return;S.ctab="price";addRecent(b.dataset.clinic);push({name:"clinic",id:b.dataset.clinic})});
+  const setReg=v=>{S.cmp.pref=v;if(!v)S.cmp.localOnly=false;try{localStorage.setItem("bhp-pref",v)}catch(e){}render();toast(v?v+"の料金を表示しています":"全国の料金を表示しています")};
+  root.querySelectorAll("[data-hpref]").forEach(b=>b.onclick=()=>setReg(b.dataset.hpref));
+  root.querySelectorAll("[data-hpref-sel]").forEach(s=>s.onchange=()=>{if(s.value)setReg(s.value)});
   root.querySelectorAll("[data-htab]").forEach(b=>b.onclick=()=>{S.htab=b.dataset.htab;render();const t=document.querySelector(".htabs");if(t&&t.getBoundingClientRect().top<0)t.scrollIntoView({block:"start"})});
   root.querySelectorAll("[data-like]").forEach(b=>b.onclick=e=>{e.stopPropagation();toggleLike(b.dataset.like)});
   root.querySelectorAll("[data-group]").forEach(b=>b.onclick=()=>{const g=GROUPS.find(x=>x.id===b.dataset.group);S.cmp.group=g.id;S.cmp.cat=g.subs[0][0];S.cmp.origin="";S.cmp.sort="price";render()});

@@ -59,7 +59,7 @@ head = f"""<!doctype html>
 </head>
 <body>
 """
-seo_css = "<style>.kn-seo{max-width:640px;margin:0 auto;padding:12px 16px calc(var(--tabh,64px) + 48px);font-size:12.5px;line-height:1.7;color:var(--muted)}.kn-seo b{display:block;color:var(--fg);font-size:13px;margin-top:6px}.kn-seo nav{display:flex;flex-wrap:wrap;gap:4px 14px;margin:4px 0 12px}.kn-seo a{color:var(--muted);text-decoration:underline;text-underline-offset:2px}</style>"
+seo_css = "<style>body:has(.kn-seo) main{padding-bottom:20px}.kn-seo{max-width:640px;margin:0 auto;padding:12px 16px calc(var(--tabh,64px) + 48px);font-size:12.5px;line-height:1.7;color:var(--muted)}.kn-seo b{display:block;color:var(--fg);font-size:13px;margin-top:6px}.kn-seo nav{display:flex;flex-wrap:wrap;gap:4px 14px;margin:4px 0 12px}.kn-seo a{color:var(--muted);text-decoration:underline;text-underline-offset:2px}</style>"
 open(f"{OUT}/index.html", "w", encoding="utf-8").write(head + app + "\n" + seo_css + seo.home_links(clinics, prices, GROUPS) + "\n</body>\n</html>\n")
 
 # ---- legal / info pages ----
