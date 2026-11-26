@@ -234,6 +234,31 @@ def generate(OUT, clinics, prices, updates, groups, css, SITE):
         return (f'<h2>{esc(label)}の相場と比べると</h2><ul class="ins">{"".join(li)}</ul>'
                 f'<p class="note">各院の通常価格のうちいちばん安い料金どうしで比べています。製剤・単位数・部位が同じとは限らないため、目安としてご覧ください。<a href="/guide/price-check/">料金表の見方</a></p>')
 
+    def neighbors(c, ps):
+        """院ページ用:同じ都道府県の他院と、同じ施術の通常価格を並べた比較表(各院ページへのリンク付き)。"""
+        if c.get("scope") == "national" or not c.get("pref"): return ""
+        out = ""
+        for g in groups:
+            for cat, sub in g["subs"]:
+                if not any(p["cat"] == cat and p.get("cond") == "通常" for p in ps): continue
+                d = cmins(cat, c["pref"])
+                if c["id"] not in d or len(d) < 3: continue
+                order = sorted(d.items(), key=lambda kv: (kv[1], kv[0]))
+                pick = order[:5]
+                if c["id"] not in [k for k, _ in pick]: pick = pick[:4] + [(c["id"], d[c["id"]])]
+                unit = "(1ccあたり)" if cat == "rejuran" else ""
+                trs = ""
+                for cid, u in pick:
+                    rank = 1 + sum(1 for x in d.values() if x < u)
+                    c2 = C[cid]
+                    nm = esc(c2["name"]) if cid == c["id"] else f'<a href="/clinic/{esc(cid)}/">{esc(c2["name"])}</a>'
+                    me = ' class="me"' if cid == c["id"] else ""
+                    trs += f'<tr{me}><td>{rank}</td><td>{nm}<small>{esc(c2.get("area",""))}</small></td><td>{yen(u)}円</td></tr>'
+                out += (f'<h3>{esc(g["short"])} {esc(sub)}{esc(unit)}</h3><div class="tw"><table class="gt nb"><thead><tr><th>安い順</th><th>クリニック</th><th>通常価格</th></tr></thead><tbody>{trs}</tbody></table></div>')
+        if not out: return ""
+        return (f'<h2>{esc(c["pref"])}の他院と料金を比べる</h2>{out}'
+                f'<p class="note">{esc(c["pref"])}の単独院の通常価格(各院でいちばん安い料金)を安い順に並べています。製剤・単位数・部位が同じとは限りません。{lastj}時点。</p>')
+
     MIN_INDEX = 2   # 1院だけの「比較」ページは検索に出さない(2院のページは院を増やして厚くする)
 
     local = {}
@@ -272,6 +297,7 @@ def generate(OUT, clinics, prices, updates, groups, css, SITE):
                 sp = sorted([p for p in gp if p["cat"] == cat], key=lambda p: (COND_ORDER.get(p.get("cond"), 9), p["price"]))
                 if sp: body += f'<h3>{esc(label)}</h3><ol class="pl np">' + "".join(row(p, compact=True) for p in sp) + "</ol>"
         body += market(c, ps)
+        body += neighbors(c, ps)
         rel = []
         if c.get("pref") in PREF_SLUG:
             ps_ = PREF_SLUG[c["pref"]]
@@ -294,11 +320,11 @@ def generate(OUT, clinics, prices, updates, groups, css, SITE):
         for pref, slug in PREFS:
             n = len({p["clinicId"] for p in gp if C[p["clinicId"]].get("pref") == pref})
             if n: prefs.append(f'<a href="/{slug}/{g["id"]}/">{esc(pref)}<small>{n}院</small></a>')
-        body = (f'<h1>{esc(g["name"])}の料金相場と最安値【全国{ncl}院】</h1><p class="lead">全国{ncl}院の公式サイトに掲載された{esc(g["name"])}の料金{len(gp)}件をもとに、相場(中央値)と安い順のランキングをまとめました。{lastj}更新。</p>'
+        body = (f'<h1>{esc(g["name"])}の料金相場と最安値【全国{ncl}院】</h1><p class="lead">全国{ncl}院の公式サイトに掲載された{esc(g["name"])}の料金{len(gp)}件をもとに、相場(中央値)と安い順の一覧をまとめました。{lastj}更新。</p>'
                 + insights(gp, g, "全国") + gsections(gp, g, limit=15) + f'<h2>都道府県から探す</h2><div class="links grid">{"".join(prefs)}</div>' + app_cta() + facts(g))
-        title = f'{g["name"]}の料金相場・最安値ランキング【全国{ncl}院・{lastj}更新】｜キレイネ'
+        title = f'{g["name"]}の料金相場と安い順一覧【全国{ncl}院・{lastj}更新】｜キレイネ'
         st = stats([p for p in gp if p["cat"] == g["subs"][0][0]])
-        desc = f'{g["name"]}の料金を全国{ncl}院の公式サイトから比較。' + (f'{g["subs"][0][1]}の中央値は{yen(st[1])}円、最安は{yen(st[0])}円。' if st else "") + "安い順のランキングと都道府県別の料金がわかります。"
+        desc = f'{g["name"]}の料金を全国{ncl}院の公式サイトから比較。' + (f'{g["subs"][0][1]}の中央値は{yen(st[1])}円、最安は{yen(st[0])}円。' if st else "") + "安い順の一覧と都道府県別の料金がわかります。"
         write(g["id"], title, desc, [("トップ", "/"), (g["name"], f'/{g["id"]}/')], body)
 
     # ---- prefecture hubs and prefecture x treatment ----

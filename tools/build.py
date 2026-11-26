@@ -108,7 +108,7 @@ seo_urls += guides.generate(clinics, prices, updates, GROUPS,
 
 # ---- static extras ----
 today = datetime.date.today().isoformat()
-open(f"{OUT}/robots.txt", "w").write(f"User-agent: *\nAllow: /\nSitemap: {SITE}/sitemap.xml\n")
+open(f"{OUT}/robots.txt", "w").write(f"User-agent: *\nAllow: /\nDisallow: /cdn-cgi/\nSitemap: {SITE}/sitemap.xml\n")
 urls = [""] + sorted(seo_urls) + ["about", "terms", "privacy", "contact"]
 # lastmod は「中身が実際に変わった日」だけ進める(毎日全URLを今日にすると Google が lastmod を信用しなくなる)
 import hashlib
