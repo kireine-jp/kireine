@@ -317,7 +317,7 @@ def generate(OUT, clinics, prices, updates, groups, css, SITE):
             np_ = [p for p in P if p["clinicId"] in national and CAT2G.get(p["cat"]) is g]
             gl.append(f'<a href="/{slug}/{g["id"]}/">{esc(g["name"])}<small>{nloc}院</small></a>')
             sub_areas = []
-            for aslug, (kind, label, cids) in sorted(areas.items(), key=lambda x: -len(x[1][2])):
+            for aslug, (kind, label, cids) in sorted(areas.items(), key=lambda x: (-len(x[1][2]), x[0])):
                 n = len({p["clinicId"] for p in lp if p["clinicId"] in cids})
                 if n >= 2: sub_areas.append(f'<a href="/{slug}/{aslug}/{g["id"]}/">{esc(label)}<small>{n}院</small></a>')
             body = (f'<h1>{esc(pref)}の{esc(g["name"])}料金比較【{nloc}院・安い順】</h1>'
@@ -348,7 +348,7 @@ def generate(OUT, clinics, prices, updates, groups, css, SITE):
                 write(f'{slug}/{aslug}/{g["id"]}', title, desc, [("トップ", "/"), (pref, f'/{slug}/'), (g["name"], f'/{slug}/{g["id"]}/'), (label, f'/{slug}/{aslug}/{g["id"]}/')], body, noindex=n < MIN_INDEX)
         cl = sorted(ids, key=lambda i: C[i]["name"])
         clinic_links = "".join(f'<a href="/clinic/{esc(i)}/">{esc(C[i]["name"])}<small>{esc(C[i].get("area",""))}</small></a>' for i in cl if any(p["clinicId"] == i for p in P))
-        area_links = "".join(f'<a href="/{slug}/{a}/{g["id"]}/">{esc(v[1])}の{esc(g["short"])}</a>' for a, v in sorted(areas.items(), key=lambda x: -len(x[1][2])) for g in groups
+        area_links = "".join(f'<a href="/{slug}/{a}/{g["id"]}/">{esc(v[1])}の{esc(g["short"])}</a>' for a, v in sorted(areas.items(), key=lambda x: (-len(x[1][2]), x[0])) for g in groups
                              if len({p["clinicId"] for p in P if p["clinicId"] in v[2] and CAT2G.get(p["cat"]) is g}) >= 2)
         body = (f'<h1>{esc(pref)}の美容皮膚科 料金比較【{len(ids)}院】</h1><p class="lead">{esc(pref)}の美容皮膚科・美容クリニック{len(ids)}院の料金を、公式サイトの料金表から施術別に比較できます。{lastj}更新。</p>'
                 + pref_table(pref, ids)
