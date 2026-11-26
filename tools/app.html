@@ -454,6 +454,18 @@ main{padding-top:24px;gap:30px}
 .fab{bottom:24px}
 .ctabar{bottom:0}
 }
+
+/* ===== photo look (K-beauty info app style) ===== */
+.ph-img{position:absolute;top:0;right:0;bottom:0;width:58%;overflow:hidden;pointer-events:none}
+.ph-img img{width:100%;height:100%;object-fit:cover;object-position:60% 30%;display:block}
+.ph-img::before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,var(--tint) 0%,color-mix(in srgb,var(--tint) 55%,transparent) 30%,transparent 62%);z-index:1}
+.dc .ph{background:var(--tint)}
+.dc .ph .ph-img{width:62%}
+.dc .ph .k,.dc .ph .h,.dc .ph .bp{position:relative;z-index:2;text-shadow:0 0 12px var(--tint),0 0 4px var(--tint)}
+.dc .ph .bdg{z-index:3}
+.ghero.photo{background:var(--tint);min-height:200px}
+.ghero.photo>*:not(.ph-img){position:relative;z-index:2;max-width:62%}
+.ghero.photo .ph-img{width:55%}
 </style>
 
 <header class="top"><div class="wrap" id="topbar"></div></header>
@@ -497,6 +509,9 @@ hair:s('<path d="M30 100C44 93 56 103 72 97C88 91 104 98 118 94V112C100 116 50 1
 spot:s('<ellipse cx="52" cy="72" rx="31" ry="36" fill="'+W+'" opacity=".93"/><path d="M38 66Q43 71 48 66M57 66Q62 71 67 66" stroke="rgba(0,0,0,.28)" stroke-width="2.2" stroke-linecap="round"/><path d="M46 88Q52 92 58 88" stroke="rgba(0,0,0,.22)" stroke-width="2" stroke-linecap="round"/><circle cx="37" cy="79" r="3.2" fill="rgba(0,0,0,.16)"/><circle cx="66" cy="80" r="2.6" fill="rgba(0,0,0,.1)"/><circle cx="71" cy="74" r="1.8" fill="rgba(0,0,0,.06)"/><rect x="80" y="12" width="30" height="20" rx="5" fill="'+W+'" opacity=".95" transform="rotate(22 95 22)"/><path d="M84 38L72 52M93 41L88 58M76 32L62 40" stroke="'+W+'" stroke-width="2.6" stroke-linecap="round" opacity=".75"/>'+sp(104,52,5,.9)+sp(18,36,3.5,.7)),
 booster:s('<rect x="27" y="28" width="22" height="13" rx="4" fill="'+W+'" opacity=".6"/><rect x="24" y="40" width="28" height="50" rx="8" fill="'+W+'" opacity=".95"/><rect x="28" y="62" width="20" height="22" rx="4" fill="'+D+'"/><path d="M72 14C96 29 96 44 84 59C72 74 72 89 96 104" stroke="'+W+'" stroke-width="3.2" stroke-linecap="round" opacity=".95"/><path d="M96 14C72 29 72 44 84 59C96 74 96 89 72 104" stroke="'+W+'" stroke-width="3.2" stroke-linecap="round" opacity=".55"/><path d="M77 23H91M78 41H90M78 77H90M77 95H91" stroke="'+W+'" stroke-width="2" stroke-linecap="round" opacity=".6"/><path d="M60 16C60 16 66 24 66 28A6 6 0 0 1 54 28C54 24 60 16 60 16Z" fill="'+W+'" opacity=".85"/>'+sp(62,98,4.5,.9)+sp(16,22,3,.6))
 }})();
+const IMG={hair:"/img/hair.jpg",botox:"/img/botox.jpg",filler:"/img/filler.jpg",spot:"/img/spot.jpg",booster:"/img/booster.jpg"};
+const TINT={hair:"var(--t-hair)",botox:"var(--t-botox)",filler:"var(--t-filler)",spot:"var(--t-spot)",booster:"var(--t-booster)"};
+const photo=(id,cls="ph-img")=>'<span class="'+cls+'" aria-hidden="true"><img src="'+IMG[id]+'" alt="" loading="lazy" decoding="async"></span>';
 const GROUPS=[
  {id:"hair",rank:1,name:"医療脱毛",short:"医療脱毛",stat:61.2,lead:"レーザーで毛根の発毛組織にダメージを与え、毛を生えにくくする施術。",
   facts:[["回数の目安","5〜8回(部位による)"],["通う間隔","1〜3ヶ月ごと"],["ダウンタイム","赤み 数時間〜数日"],["痛み","機器・部位で差が大きい"]],risk:["赤み・ほてり・毛嚢炎","やけど(まれ)","硬毛化・増毛化(まれ)"],
@@ -588,7 +603,7 @@ function discountOf(p){if(p.cond==="通常")return null;const base=S.prices.find
 function dealCard(p){const g=CAT2G[p.cat],c=S.clinics[p.clinicId],ra=revAgg(p.clinicId),d=discountOf(p),low=lowest(p.cat);
   const b=[];if(low&&low.id===p.id)b.push('<span class="w">最安</span>');if(p.changed&&p.changed.from>p.price)b.push('<span class="w">値下げ</span>');if(COND[p.cond])b.push('<span>'+COND[p.cond]+'</span>');
   const up=unitPrice(p);
-  return '<button class="dc" data-clinic="'+esc(p.clinicId)+'"><span class="ph g-'+g.id+'"><span class="wm">'+ART[g.id]+'</span><span class="bdg">'+b.join("")+'</span><span class="k">'+esc(g.short)+'</span><span class="h">'+esc(SUBNAME(p.cat))+'</span><span class="bp">'+yen(p.price)+'<small>円</small></span></span>'+
+  return '<button class="dc" data-clinic="'+esc(p.clinicId)+'"><span class="ph g-'+g.id+'" style="--tint:'+TINT[g.id]+'">'+photo(g.id)+'<span class="bdg">'+b.join("")+'</span><span class="k">'+esc(g.short)+'</span><span class="h">'+esc(SUBNAME(p.cat))+'</span><span class="bp">'+yen(p.price)+'<small>円</small></span></span>'+
    '<span class="bd">'+(ra.n?'<span class="rt"><i>★</i><b>'+ra.avg.toFixed(1)+'</b>('+ra.n+')</span>':'')+'<span class="ti">'+esc(p.product)+(p.units?' '+p.units+'単位':p.cc&&p.cc!==1?' '+p.cc+'cc':'')+'</span><span class="lo">'+esc(c?.name||"")+' · '+esc(c?.scope==="national"?"全国":(c?.pref||""))+'</span>'+
    (d?'<span class="pr"><em>'+d.pct+'%OFF</em><s>通常 '+yen(d.from)+'円</s></span>':up?'<span class="pr"><span class="xs" style="color:var(--accent);font-weight:700">'+(p.units?'1単位':'1cc')+'あたり '+yen(Math.round(up))+'円</span></span>':'')+(p.tax?'':'<span class="xs" style="color:var(--warn)">税表記要確認</span>')+'</span></button>'}
 function homeDeals(){
@@ -675,7 +690,7 @@ function vCompare(){
 }
 function vGuide(v){
   const g=GROUPS.find(x=>x.id===v.id)||GROUPS[0];const sub=v.cat&&g.subs.some(s=>s[0]===v.cat)?v.cat:g.subs[0][0];const st=statsOf(sub);
-  let h='<section class="ghero g-'+g.id+'"><span class="ga">'+ART[g.id]+'</span><span class="gi">'+IC[g.id]+'</span><h1>'+esc(g.name)+'</h1><p>'+esc(g.lead)+'</p>'+(g.rank?'<span class="xs" style="font-weight:700;opacity:.9">国内施術件数 '+g.rank+'位 · 約'+g.stat+'万件(2022年)</span>':'')+'</section>';
+  let h='<section class="ghero photo g-'+g.id+'" style="--tint:'+TINT[g.id]+'">'+photo(g.id)+'<span class="gi">'+IC[g.id]+'</span><h1>'+esc(g.name)+'</h1><p>'+esc(g.lead)+'</p>'+(g.rank?'<span class="xs" style="font-weight:700;opacity:.9">国内施術件数 '+g.rank+'位 · 約'+g.stat+'万件(2022年)</span>':'')+'</section>';
   if(g.subs.length>1)h+='<div class="seg" role="group">'+g.subs.map(s=>'<button data-gcat="'+s[0]+'" aria-pressed="'+(s[0]===sub)+'">'+esc(s[1])+'</button>').join("")+'</div>';
   h+='<section><div class="sh"><div><h2>料金相場</h2><p>'+esc(SUBNAME(sub))+' · 通常価格 '+(st?st.n:0)+'件から算出</p></div></div>'+
    (st?'<div class="stats"><div class="stat"><span>最安</span><b>'+yen(Math.round(st.min))+'<small>円</small></b></div><div class="stat"><span>中央値</span><b>'+yen(Math.round(st.med))+'<small>円</small></b></div><div class="stat"><span>最高</span><b>'+yen(Math.round(st.max))+'<small>円</small></b></div></div>':'<div class="empty">まだ料金がありません</div>')+'</section>';

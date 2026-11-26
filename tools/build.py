@@ -141,6 +141,8 @@ open(f"{OUT}/_headers", "w").write("/tools/*\n  X-Robots-Tag: noindex\n/ig/*\n  
 if os.path.exists(f"{HERE}/redirects.txt"):
     shutil.copy(f"{HERE}/redirects.txt", f"{OUT}/_redirects")
 import shutil
+os.makedirs(f"{OUT}/img", exist_ok=True)
+for f in glob.glob(f"{HERE}/img/*.jpg"): shutil.copy(f, f"{OUT}/img/")
 for f in ("favicon.svg", "og.png", "apple-touch-icon.png", "mascot.jpg", "mascot@2x.jpg"):
     shutil.copy(f"{HERE}/{f}", f"{OUT}/{f}")
 # ---- Google アナリティクス(GA4)を公開ページ全体に挿入(/ig/ /tools/ は除外) ----
